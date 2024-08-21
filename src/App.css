@@ -4,13 +4,6 @@
   height: 100vh;
 }
 
-.sidebar {
-  width: 300px;
-  background: rgb(131, 58, 180);
-  background: linear-gradient(180deg, rgba(131, 58, 180, 1) 0%, rgba(29, 167, 253, 1) 100%);
-  color: white;
-}
-
 .main_view {
   flex: 1;
 }

@@ -19,8 +19,15 @@ const ChatListItem = ({ chat_id, chat_name, member_ids, setSelectedChat, setIsCh
 
     return (
         <div className='sidebar-chat-item' onClick={selectChat}>
-            <div className='sidebar-chat-item-header'>
-                <span className='sidebar-chat-item-header-name'>{chat_name} </span><span className='sidebar-chat-item-header-id'>{chat_id}</span>
+            <div className='sidebar-chat-item-pfp-container'>
+                <img src="https://www.w3schools.com/howto/img_avatar2.png" alt="Avatar" className='sidebar-chat-item-pfp'/>
+            </div>
+            <div className='sidebar-chat-item-text'>
+                <div className='sidebar-chat-item-header'>
+                    <span className='sidebar-chat-item-header-name'>{chat_name} </span>
+                    <span className='sidebar-chat-item-header-id'>{chat_id}</span>
+                </div>
+                <div className='sidebar-chat-item-last-message'>Placeholder text</div>
             </div>
         </div>
     )
@@ -74,7 +81,7 @@ const Header = ({ setIsAuthenticated, setSelectedChat, setIsChatSelected }) => {
     return (
         <div className="sidebar-header">
             <div className='sidebar-header-service-name'>
-                Friscord
+                FRISCORD
             </div>
             <div className="sidebar-header-button">
                 <div className="sidebar-header-button-icon">

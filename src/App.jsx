@@ -35,9 +35,9 @@ function App() {
             ? <Chat selectedChat={selectedChat}/>
             : (
               <div className="room">
-                <label>Izberi pogovor</label>
+                <label>Enter chat ID: </label>
                 <input onChange={(e) => setSelectedChat(e.target.value)}/>
-                <button onClick={() => setIsChatSelected(true)}>Potrdi</button>
+                <button onClick={() => setIsChatSelected(true)}>Confirm</button>
               </div>
             )
           }

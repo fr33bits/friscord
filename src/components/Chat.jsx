@@ -1,10 +1,13 @@
 import { useEffect, useState, useRef } from 'react'
+
 import { addDoc, collection, onSnapshot, serverTimestamp, where, query, orderBy } from 'firebase/firestore'
 import { auth, db } from '../firebase-config.js'
 
 import '../styles/Chat.css'
 
 export const Chat = ({ selectedChat }) => {
+    const { format } = require('date-fns');
+
     const messagesRef = collection(db, 'messages')
     const [messages, setMessages] = useState([])
 
@@ -22,7 +25,7 @@ export const Chat = ({ selectedChat }) => {
         const unsubscribe = onSnapshot(queryChatMesssages, (snapshot) => {
             let queriedMessages = []
             snapshot.forEach((doc) => {
-                queriedMessages.push({ ...doc.data(), id: doc.id }) // če bi id že obstajal, ne bi bil dodan
+                queriedMessages.push({ ...doc.data(), id: doc.id }) // if the id already existed, it would not be added
             })
             setMessages(queriedMessages)
         })
@@ -51,35 +54,60 @@ export const Chat = ({ selectedChat }) => {
         }
     }
 
+
     return (
         <div className="chat">
-            <div className="header">
-                <h1>{selectedChat}</h1>
-            </div>
+            <div className='header-background'></div>
+                <div className="header">
+                    <div className="chat-title">{selectedChat}</div>
+                </div>
+            
             <div className='messages-container'>
                 <div className='messages'>
                         {messages.map((message) => (
                             <div className='message-row'>
-                                <div id={message.id} key={message.id} className={message.user === auth.currentUser.displayName ? 'message own-message' : 'message not-own-message'}>
-                                    <span className='user' >{message.user}</span>
-                                    {message.text} ob {message.createdAt?.seconds}
-                                    {/* Potreben ? sicer vedno dobim napako */}
+                                <div
+                                    id={message.id}
+                                    key={message.id}
+                                    className={message.user === auth.currentUser.displayName ? 'message own-message' : 'message not-own-message'}
+                                    style={{textAlign: message.user === auth.currentUser.displayName ? 'right' : 'left'}}
+                                >
+                                    <div className='message-user'>{message.user}</div>
+                                    <div
+                                        className='message-text'
+                                        style={
+                                            {
+                                                marginLeft: message.user === auth.currentUser.displayName ? 'auto' : '0',
+                                                borderRadius: message.user === auth.currentUser.displayName ? '15px 15px 0 15px' : '15px 15px 15px 0'
+                                            }
+                                        }
+                                        title={'Message ID: ' + message.id}
+                                    >
+                                        {/* Style needed to push the message text to the right even though the parent div is already pushed to the right */}
+                                        {message.text}
+                                    </div>
+                                    <div className='message-timestamp'>
+                                        {format(Date(message.createdAt?.seconds), 'dd. MM. yyyy HH:mm:ss')}
+                                        {/* Potreben ? sicer vedno dobim napako */}
+                                    </div>
                                 </div>
                             </div>
                         ))}
                     <div ref={messagesEndRef}></div>
                 </div>
             </div>
-            <div className='new-message-form-container'>
-                <form onSubmit={handleSubmit} className="new-message-form">
-                    <input
-                        onChange={(e) => setNewMessage(e.target.value)}
-                        value={newMessage}
-                        className="new-message-input"
-                        placeholder="Click send to change the world"
-                    />
-                    <button type="submit" className="send-button">Send</button>
-                </form>
+            <div className='new-message-form-container-background'>
+                <div className='new-message-form-container'>
+                    <form onSubmit={handleSubmit} className="new-message-form">
+                        <input
+                            onChange={(e) => setNewMessage(e.target.value)}
+                            value={newMessage}
+                            className="new-message-input"
+                            placeholder="Type a messsage..."
+                        />
+                        <button type="submit" className="send-button" title="Click to change the world!">Send</button>
+                    </form>
+                </div>
             </div>
         </div>
     )

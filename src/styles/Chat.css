@@ -3,21 +3,51 @@
     height: 100%;
     display: flex;
     flex-direction: column;
+    position: relative; /* needed to make sure that the new-message-form-container has the (100%) width of this element and not the entire viewport */
+}
+
+.header-background {
+    display: block;
+    height: 60px;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    z-index: 7;
+    backdrop-filter: blur(30px);
+    -webkit-mask: linear-gradient(black 95%, transparent);
 }
 
 .header {
-    background-color: #c5c5c5;
+    background-color: #ffffff;
     color: rgb(0, 0, 0);
-    width: 100%;
+    width: auto;
+    height: 50px;
+    margin: 0 10px;
+    z-index: 8;
+
+    box-shadow: 0px 0px 12px 10px rgb(234, 234, 234);
+    border-radius: 0 0 15px 15px;
+
+    text-align: center; /* needed to center align the child div */
+}
+
+.chat-title {
+    display: inline-block;
+    height: 100%;
+    line-height: 50px;
+    margin-right: auto;
+    margin-left: auto;
     text-align: center;
-    height: 75px;
+    vertical-align: middle;
 }
 
 /* MESSAGES */
 
 .messages-container {
     flex: 1;
-    overflow-y:scroll;
+    overflow-y: scroll;
+    padding-bottom: 60px; /* adjustment for floating message form */
+    /* TODO: doesn't seem like there's an easy way to fix the scrollbar being hidden behind the form; could use the perfect-scrollbar library */
 }
 
 .messages {
@@ -25,8 +55,7 @@
     flex-direction: column;
     align-items: flex-start;
     max-height: auto;
-    margin-bottom: 10px;
-    padding: 15px;
+    padding: 20px 20px 0px 20px;
 }
 
 .message-row {
@@ -36,27 +65,68 @@
 
 .message {
     max-width: 400px;
+    width:fit-content;
 }
 
 .own-message {
     float: right;
 }
 
-.user {
-    font-weight: bold;
-    margin-right: 10px;
-    color: #333;
+.message-user {
+    /* font-weight: bold; */
+    font-size: small;
+}
+
+.message-text {
+    background-color: #2397d1;
+    color: white;
+    margin: 3px 0;
+    padding: 10px;
+    width: fit-content;
+}
+
+.message-timestamp {
+    font-size:x-small
+}
+
+
+.new-message-form-container-background {
+    display: block;
+    height: 60px;
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+    z-index: 7;
+
+    &:after {
+        content: '';
+        position: absolute;
+        top: -20px;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        backdrop-filter: blur(20px);
+        -webkit-mask: linear-gradient(transparent, black 30%);
+    }
 }
 
 .new-message-form-container {
+    display: block;
     height: 60px;
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+    background-color: #00000000;
+    z-index: 8;
 }
 
 .new-message-form {
     display: flex;
-    width: 100%;
     margin: 10px;
     width: auto;
+    box-shadow: 0 0 12px 5px rgb(234, 234, 234);
+    background-color: #ffffff;
+    border-radius: 15px;
 }
 
 .new-message-input {
@@ -73,8 +143,10 @@
 .send-button {
     border: none;
     outline: none;
-    background: #3b5998;
+    background: #2397d1;
     color: #fff;
     font-size: 16px;
+    border-radius: 15px;
     font-weight: bold;
+    padding: 10px;
 }

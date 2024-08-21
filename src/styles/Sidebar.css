@@ -1,17 +1,32 @@
+.sidebar {
+    width: 300px;
+    color: rgb(36, 36, 36);
+
+    margin: 10.75px;
+    border-radius: 15px;
+    box-shadow: 0 0 12px 5px rgb(234, 234, 234);
+
+    padding: 10px;
+}
+
 .sidebar-header {
     display: flex;
     flex-direction: row;
     align-items: center;
-    max-height: 50px;
-    padding: 15px;
-    border-bottom: 2px solid white;
+    max-height: 40px;
+    padding: 10px;
+    border-radius: 15px;
+    line-height: 40px;
+
+    background: rgb(131, 58, 180);
+    background: linear-gradient(150deg, rgba(131, 58, 180, 1) 0%, rgb(29, 178, 253) 100%);
+    color: white;
 }
 
 .sidebar-header-service-name {
     flex: 1;
-    font-size: 30px;
-    font-family: Arial, Helvetica, sans-serif;
-    
+    font-size: 27px;
+    font-family: 'Silkscreen', sans-serif;
 }
 
 .sidebar-header-button {
@@ -44,7 +59,26 @@
 }
 
 .sidebar-chat-item:hover {
-    background-color: rgba(255, 255, 255, 0.207);
+    background-color: rgb(240, 240, 240);
+}
+
+.sidebar-chat-item-pfp-container {
+    display: inline-block;
+    height: 50px;
+    width: 50px;
+}
+
+.sidebar-chat-item-pfp {
+    height: 50px;
+    width: 50px;
+    border-radius: 50%;
+}
+
+.sidebar-chat-item-text {
+    display: inline-block;
+    height: 50px;
+    margin-left: 10px;
+    vertical-align: bottom; /* makes sure the divs are in alignment! */
 }
 
 .sidebar-chat-item-header {
@@ -55,6 +89,6 @@
 
 .sidebar-chat-item-header-id {
     margin-left: 10px;
-    color: rgb(197, 197, 197);
+    color: rgb(122, 122, 122);
     font-size: 10px;
 }
