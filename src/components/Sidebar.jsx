@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import '../styles/Sidebar.css'
-import { signOut } from 'firebase/auth'
+import firebase from 'firebase/compat/app';
+import { signOut, getAuth, onAuthStateChanged } from 'firebase/auth'
 import { auth, db } from '../firebase-config.js'
-import { addDoc, collection, onSnapshot, serverTimestamp, where, query, orderBy } from 'firebase/firestore'
+import { addDoc, collection, onSnapshot, serverTimestamp, where, query, orderBy, doc, getDoc } from 'firebase/firestore'
 
 import SettingsIcon from '../assets/settings.png'
 import LogoutIcon from '../assets/logout.png'
@@ -12,8 +13,17 @@ const cookies = new Cookies();
 
 const ChatListItem = ({ chat_id, chat_name, member_ids, setSelectedChat, setIsChatSelected }) => {
 
-    const selectChat = () => {
-        setSelectedChat(chat_name);
+    const getChat = async (chat_id) => {
+        const docRef = doc(db, "chats", chat_id)
+        const docSnap = await getDoc(docRef)
+        const data = docSnap.data()
+        data.id = docSnap.id // manually adds back in the Firestore document ID
+        return data
+    }
+
+    const selectChat = async () => {
+        const data = await getChat(chat_id)
+        setSelectedChat(data);
         setIsChatSelected(true)
     }
 
@@ -24,8 +34,7 @@ const ChatListItem = ({ chat_id, chat_name, member_ids, setSelectedChat, setIsCh
             </div>
             <div className='sidebar-chat-item-text'>
                 <div className='sidebar-chat-item-header'>
-                    <span className='sidebar-chat-item-header-name'>{chat_name} </span>
-                    <span className='sidebar-chat-item-header-id'>{chat_id}</span>
+                    <span className='sidebar-chat-item-header-name' title={"Chat ID: "+ chat_id}>{chat_name} </span>
                 </div>
                 <div className='sidebar-chat-item-last-message'>Placeholder text</div>
             </div>
@@ -37,29 +46,35 @@ const ChatList = ({ setSelectedChat, setIsChatSelected}) => {
     const chatsRef = collection(db, 'chats')
     const [chats, setChats] = useState([])
 
-    useEffect(() => {
-        const queryChatList = query(
-            chatsRef
-        )
-
-        const unsubscribe = onSnapshot(queryChatList, (snapshot) => {
-            let queriedChats = []
-            snapshot.forEach((doc) => {
-                queriedChats.push({ ...doc.data(), id: doc.id })
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            const uid = user.uid;
+            const queryChatList = query(
+                chatsRef,
+                where("member_ids", "array-contains", uid),
+            )
+    
+            const unsubscribe = onSnapshot(queryChatList, (snapshot) => {
+                let queriedChats = []
+                snapshot.forEach((doc) => {
+                    queriedChats.push({ ...doc.data(), id: doc.id })
+                })
+                setChats(queriedChats)
             })
-            setChats(queriedChats)
-        })
-
-        return () => unsubscribe()
-    }, [])
+    
+            return () => unsubscribe()
+        } else {
+            console.log("User is signed out!!!")
+        }
+    });
 
     return (
         <div>
             {chats.map((chat) => (
-                <ChatListItem
+                <ChatListItem 
                     key={chat.id}
                     chat_id={chat.id}
-                    chat_name={chat.chat_id}
+                    chat_name={chat.name}
                     members={chat.member_ids}
                     setSelectedChat={setSelectedChat}
                     setIsChatSelected={setIsChatSelected}
@@ -79,8 +94,8 @@ const Header = ({ setIsAuthenticated, setSelectedChat, setIsChatSelected }) => {
     }
 
     return (
-        <div className="sidebar-header">
-            <div className='sidebar-header-service-name'>
+        <div className="sidebar-header gradient">
+            <div className='sidebar-header-service-name service-name'>
                 FRISCORD
             </div>
             <div className="sidebar-header-button">

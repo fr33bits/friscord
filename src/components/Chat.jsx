@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react'
 
-import { addDoc, collection, onSnapshot, serverTimestamp, where, query, orderBy } from 'firebase/firestore'
+import { addDoc, collection, onSnapshot, serverTimestamp, where, query, orderBy, doc, getDoc } from 'firebase/firestore'
+
 import { auth, db } from '../firebase-config.js'
 
 import '../styles/Chat.css'
@@ -12,14 +13,13 @@ export const Chat = ({ selectedChat }) => {
     const [messages, setMessages] = useState([])
 
     const [newMessage, setNewMessage] = useState("")
-    const [inReplyToMessageID, setinReplyToMessageID] = useState(null)
 
     const messagesEndRef = useRef(null)
 
     useEffect(() => {
         const queryChatMesssages = query(
             messagesRef,
-            where("chat_id", "==", selectedChat),
+            where("chat_id", "==", selectedChat.id),
             orderBy('createdAt')
         )
         const unsubscribe = onSnapshot(queryChatMesssages, (snapshot) => {
@@ -31,7 +31,7 @@ export const Chat = ({ selectedChat }) => {
         })
 
         return () => unsubscribe() // TODO: poglej, zakaj je to pomembno
-    }, [])
+    }, [selectedChat])
 
     useEffect(() => {
         if (messagesEndRef.current) {
@@ -47,19 +47,50 @@ export const Chat = ({ selectedChat }) => {
             await addDoc(messagesRef, {
                 text: newMessage,
                 createdAt: serverTimestamp(),
-                user: auth.currentUser.displayName,
-                chat_id: selectedChat
+                sender_id: auth.currentUser.uid,
+                chat_id: selectedChat.id
             })
             setNewMessage("")
         }
     }
 
+    // USER DATA
+    const [senders, setSenders] = useState([])
+    useEffect(() => {
+        const fetchSenders = async () => {
+            const uniqueSenderIDs = []
+            for (let i = 0; i < messages.length; i++) {
+                const sender_id = messages[i].sender_id
+                if (!uniqueSenderIDs.includes(sender_id)) {
+                    uniqueSenderIDs.push(sender_id)
+                }
+            }
+    
+            async function getUser(user_id) {
+                const docRef = doc(db, "users", user_id)
+                const docSnap = await getDoc(docRef)
+                const data = docSnap.data()
+                data.id = docSnap.id
+                console.log(data)
+                return data
+            }
+            
+            const chatSenders = []
+            for (let i = 0; i < uniqueSenderIDs.length; i++) {
+                const data = await getUser(uniqueSenderIDs[i])
+                chatSenders[uniqueSenderIDs[i]] = data
+            }
+            setSenders(chatSenders)
+        }
+    
+        fetchSenders()
+    }, [messages])
 
     return (
         <div className="chat">
             <div className='header-background'></div>
                 <div className="header">
-                    <div className="chat-title">{selectedChat}</div>
+                    <div className="chat-title">{selectedChat.name}</div>
                 </div>
             
             <div className='messages-container'>
@@ -69,16 +100,16 @@ export const Chat = ({ selectedChat }) => {
                                 <div
                                     id={message.id}
                                     key={message.id}
-                                    className={message.user === auth.currentUser.displayName ? 'message own-message' : 'message not-own-message'}
-                                    style={{textAlign: message.user === auth.currentUser.displayName ? 'right' : 'left'}}
+                                    className={message.sender_id === auth.currentUser.uid ? 'message own-message' : 'message not-own-message'}
+                                    style={{textAlign: message.sender_id === auth.currentUser.uid ? 'right' : 'left'}}
                                 >
-                                    <div className='message-user'>{message.user}</div>
+                                    <div className='message-user'>{senders[message.sender_id]?.name}</div>
                                     <div
                                         className='message-text'
                                         style={
                                             {
-                                                marginLeft: message.user === auth.currentUser.displayName ? 'auto' : '0',
-                                                borderRadius: message.user === auth.currentUser.displayName ? '15px 15px 0 15px' : '15px 15px 15px 0'
+                                                marginLeft: message.sender_id === auth.currentUser.uid ? 'auto' : '0',
+                                                borderRadius: message.user === auth.currentUser.uid ? '15px 15px 0 15px' : '15px 15px 15px 0'
                                             }
                                         }
                                         title={'Message ID: ' + message.id}

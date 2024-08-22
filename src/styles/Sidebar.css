@@ -17,16 +17,12 @@
     padding: 10px;
     border-radius: 15px;
     line-height: 40px;
-
-    background: rgb(131, 58, 180);
-    background: linear-gradient(150deg, rgba(131, 58, 180, 1) 0%, rgb(29, 178, 253) 100%);
     color: white;
 }
 
 .sidebar-header-service-name {
     flex: 1;
     font-size: 27px;
-    font-family: 'Silkscreen', sans-serif;
 }
 
 .sidebar-header-button {
