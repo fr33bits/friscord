@@ -1,12 +1,12 @@
 import { useEffect, useState, useRef } from 'react'
 
-import { addDoc, collection, onSnapshot, serverTimestamp, where, query, orderBy, doc, getDoc } from 'firebase/firestore'
+import { addDoc, collection, onSnapshot, serverTimestamp, where, query, orderBy, doc, getDocs } from 'firebase/firestore'
 
 import { auth, db } from '../firebase-config.js'
 
 import '../styles/Chat.css'
 
-export const Chat = ({ selectedChat }) => {
+export const Chat = ({ selectedChat, authenticatedUser }) => {
     const { format } = require('date-fns');
 
     const messagesRef = collection(db, 'messages')
@@ -40,6 +40,7 @@ export const Chat = ({ selectedChat }) => {
     }, [messages]);
 
     const handleSubmit = async (event) => {
+        console.log("tuki dela auth:" + auth.currentUser.uid)
         event.preventDefault()
         if (newMessage === "") {
             return
@@ -47,7 +48,7 @@ export const Chat = ({ selectedChat }) => {
             await addDoc(messagesRef, {
                 text: newMessage,
                 createdAt: serverTimestamp(),
-                sender_id: auth.currentUser.uid,
+                sender_id: authenticatedUser.id_global,
                 chat_id: selectedChat.id
             })
             setNewMessage("")
@@ -65,14 +66,13 @@ export const Chat = ({ selectedChat }) => {
                     uniqueSenderIDs.push(sender_id)
                 }
             }
-    
+            
+            const usersRef = collection(db, 'users')
             async function getUser(user_id) {
-                const docRef = doc(db, "users", user_id)
-                const docSnap = await getDoc(docRef)
-                const data = docSnap.data()
-                data.id = docSnap.id
-                console.log(data)
-                return data
+                const q = query(usersRef, where("id_global", "==", user_id))
+                const querySnapshot = await getDocs(q);
+                const users = querySnapshot.docs.map(doc => doc.data());
+                return users[0]
             }
             
             const chatSenders = []
@@ -95,21 +95,21 @@ export const Chat = ({ selectedChat }) => {
             
             <div className='messages-container'>
                 <div className='messages'>
-                        {messages.map((message) => (
-                            <div className='message-row'>
+                        {messages.map((message, index) => (
+                            <div key={index} className='message-row'>
                                 <div
                                     id={message.id}
                                     key={message.id}
-                                    className={message.sender_id === auth.currentUser.uid ? 'message own-message' : 'message not-own-message'}
-                                    style={{textAlign: message.sender_id === auth.currentUser.uid ? 'right' : 'left'}}
+                                    className={message.sender_id === authenticatedUser.id_global ? 'message own-message' : 'message not-own-message'}
+                                    style={{textAlign: message.sender_id === authenticatedUser.id_global ? 'right' : 'left'}}
                                 >
                                     <div className='message-user'>{senders[message.sender_id]?.name}</div>
                                     <div
                                         className='message-text'
                                         style={
                                             {
-                                                marginLeft: message.sender_id === auth.currentUser.uid ? 'auto' : '0',
-                                                borderRadius: message.user === auth.currentUser.uid ? '15px 15px 0 15px' : '15px 15px 15px 0'
+                                                marginLeft: message.sender_id === authenticatedUser.id_global ? 'auto' : '0',
+                                                borderRadius: message.sender_id === authenticatedUser.id_global ? '15px 15px 0 15px' : '15px 15px 15px 0'
                                             }
                                         }
                                         title={'Message ID: ' + message.id}

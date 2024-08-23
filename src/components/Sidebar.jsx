@@ -42,31 +42,49 @@ const ChatListItem = ({ chat_id, chat_name, member_ids, setSelectedChat, setIsCh
     )
 }
 
-const ChatList = ({ setSelectedChat, setIsChatSelected}) => {
+const ChatList = ({ setSelectedChat, setIsChatSelected, authenticatedUser}) => {
     const chatsRef = collection(db, 'chats')
     const [chats, setChats] = useState([])
 
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            const uid = user.uid;
-            const queryChatList = query(
-                chatsRef,
-                where("member_ids", "array-contains", uid),
-            )
+    // !!! THIS ABSOLUTELY ATE UP MEMORY
+    // onAuthStateChanged(auth, (user) => {
+    //     if (user) {
+    //         const uid = user.uid;
+    //         const queryChatList = query(
+    //             chatsRef,
+    //             where("member_ids", "array-contains", uid),
+    //         )
     
-            const unsubscribe = onSnapshot(queryChatList, (snapshot) => {
-                let queriedChats = []
-                snapshot.forEach((doc) => {
-                    queriedChats.push({ ...doc.data(), id: doc.id })
-                })
-                setChats(queriedChats)
+    //         const unsubscribe = onSnapshot(queryChatList, (snapshot) => {
+    //             let queriedChats = []
+    //             snapshot.forEach((doc) => {
+    //                 queriedChats.push({ ...doc.data(), id: doc.id })
+    //             })
+    //             setChats(queriedChats)
+    //         })
+    
+    //         return () => unsubscribe()
+    //     } else {
+    //         console.log("User is signed out!!!")
+    //     }
+    // });
+
+    useEffect(() => {
+        const queryChatList = query(
+            chatsRef,
+            where("member_ids", "array-contains", authenticatedUser.id_global),
+        )
+
+        const unsubscribe = onSnapshot(queryChatList, (snapshot) => {
+            let queriedChats = []
+            snapshot.forEach((doc) => {
+                queriedChats.push({ ...doc.data(), id: doc.id })
             })
-    
-            return () => unsubscribe()
-        } else {
-            console.log("User is signed out!!!")
-        }
-    });
+            setChats(queriedChats)
+        })
+
+        return () => unsubscribe()
+    }, [authenticatedUser]); // TODO: should really be changed every time a new message queue is created, no?
 
     return (
         <div>
@@ -112,8 +130,7 @@ const Header = ({ setIsAuthenticated, setSelectedChat, setIsChatSelected }) => {
     )
 }
 
-export const Sidebar = ({ setIsAuthenticated, setSelectedChat, setIsChatSelected }) => {
-
+export const Sidebar = ({ setIsAuthenticated, setSelectedChat, setIsChatSelected, authenticatedUser }) => {
     return (
         <div>
             <Header
@@ -124,6 +141,7 @@ export const Sidebar = ({ setIsAuthenticated, setSelectedChat, setIsChatSelected
             <ChatList
                 setSelectedChat={setSelectedChat}
                 setIsChatSelected={setIsChatSelected}
+                authenticatedUser={authenticatedUser}
             />
         </div>
     )
