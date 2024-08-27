@@ -5,13 +5,42 @@ import { signOut, getAuth, onAuthStateChanged } from 'firebase/auth'
 import { auth, db } from '../firebase-config.js'
 import { addDoc, collection, onSnapshot, serverTimestamp, where, query, orderBy, doc, getDoc, getDocs, limit } from 'firebase/firestore'
 
-import SettingsIcon from '../assets/settings.png'
-import LogoutIcon from '../assets/logout.png'
-
 import Cookies from 'universal-cookie'
 const cookies = new Cookies();
 
-const ChatListItem = ({ chat, setSelectedChat, setIsChatSelected }) => {
+const Avatars = ({chat_member_ids, authenticatedUser}) => {
+    const [members, setMembers] = useState([]) // excludes the authenticated user
+
+    useEffect(() => {
+        const getPhotos = async () => {
+            const usersRef = collection(db, 'users')
+            const getUser = async (user_id) => {
+                const q = query(usersRef, where("id_global", "==", user_id))
+                const querySnapshot = await getDocs(q);
+                const users = querySnapshot.docs.map(doc => doc.data());
+                return users[0]
+            }
+            const member_ids = chat_member_ids.filter(element => element !== authenticatedUser.id_global)
+            const membersTemp = []
+            for (let i = 0; i < member_ids.length; i++) {
+                const memberTemp = await getUser(member_ids[i])
+                membersTemp.push(memberTemp)
+            }
+            setMembers(membersTemp)
+        }
+        getPhotos()
+    }, [chat_member_ids])
+
+    return (
+        <div>
+            { members.length === 0 ? (<img src="https://www.w3schools.com/howto/img_avatar2.png" alt="Avatar" className='sidebar-chat-item-pfp'/>) : null }
+            { members?.length > 0 ?
+            (<img src={members[0]?.photo_url} alt="Avatar" className='sidebar-chat-item-pfp' />) : null }
+        </div>
+    )
+}
+
+const ChatListItem = ({ chat, setSelectedChat, setIsChatSelected, authenticatedUser }) => {
     const [lastMessage, setLastMessage] = useState(null)
     const [lastMessageUser, setLastMessageUser] = useState(null)
 
@@ -38,7 +67,7 @@ const ChatListItem = ({ chat, setSelectedChat, setIsChatSelected }) => {
                 orderBy('createdAt', "desc"),
                 limit(1)
             )
-    
+
             const unsubscribe = onSnapshot(queryMessagesList, async (snapshot) => {
                 let queriedMessages = []
                 snapshot.forEach((doc) => {
@@ -47,7 +76,7 @@ const ChatListItem = ({ chat, setSelectedChat, setIsChatSelected }) => {
                 let queriedLastMessage = queriedMessages[0]
                 setLastMessage(queriedLastMessage)
             })
-    
+
             return () => unsubscribe()
         }
         getLastMessage()
@@ -61,11 +90,11 @@ const ChatListItem = ({ chat, setSelectedChat, setIsChatSelected }) => {
     return (
         <div className='sidebar-chat-item' onClick={selectChat}>
             <div className='sidebar-chat-item-pfp-container'>
-                <img src="https://www.w3schools.com/howto/img_avatar2.png" alt="Avatar" className='sidebar-chat-item-pfp'/>
+                <Avatars chat_member_ids={chat.member_ids} authenticatedUser={authenticatedUser}/>
             </div>
             <div className='sidebar-chat-item-text'>
                 <div className='sidebar-chat-item-header'>
-                    <span className='sidebar-chat-item-header-name' title={"Chat ID: "+ chat.id}>{chat.name} </span>
+                    <span className='sidebar-chat-item-header-name' title={"Chat ID: " + chat.id}>{chat.name} </span>
                 </div>
                 {lastMessageUser?.name ? <div className='sidebar-chat-item-last-message'>{lastMessageUser?.name.split(' ')[0]}: {lastMessage?.text}</div> : null}
             </div>
@@ -73,7 +102,7 @@ const ChatListItem = ({ chat, setSelectedChat, setIsChatSelected }) => {
     )
 }
 
-const ChatList = ({ setSelectedChat, setIsChatSelected, authenticatedUser}) => {
+const ChatList = ({ setSelectedChat, setIsChatSelected, authenticatedUser }) => {
     const chatsRef = collection(db, 'chats')
     const [chats, setChats] = useState([])
 
@@ -85,7 +114,7 @@ const ChatList = ({ setSelectedChat, setIsChatSelected, authenticatedUser}) => {
     //             chatsRef,
     //             where("member_ids", "array-contains", uid),
     //         )
-    
+
     //         const unsubscribe = onSnapshot(queryChatList, (snapshot) => {
     //             let queriedChats = []
     //             snapshot.forEach((doc) => {
@@ -93,7 +122,7 @@ const ChatList = ({ setSelectedChat, setIsChatSelected, authenticatedUser}) => {
     //             })
     //             setChats(queriedChats)
     //         })
-    
+
     //         return () => unsubscribe()
     //     } else {
     //         console.log("User is signed out!!!")
@@ -119,7 +148,6 @@ const ChatList = ({ setSelectedChat, setIsChatSelected, authenticatedUser}) => {
             snapshot.forEach((doc) => {
                 queriedChats.push({ ...doc.data(), id: doc.id })
             })
-            console.log(queriedChats)
             setChats(queriedChats)
         })
 
@@ -129,11 +157,12 @@ const ChatList = ({ setSelectedChat, setIsChatSelected, authenticatedUser}) => {
     return (
         <div>
             {chats.map((chat) => (
-                <ChatListItem 
+                <ChatListItem
                     key={chat.id}
                     chat={chat}
                     setSelectedChat={setSelectedChat}
                     setIsChatSelected={setIsChatSelected}
+                    authenticatedUser={authenticatedUser}
                 />
             ))}
         </div>
@@ -154,14 +183,18 @@ const Header = ({ setIsAuthenticated, setSelectedChat, setIsChatSelected }) => {
             <div className='sidebar-header-service-name service-name'>
                 FRISCORD
             </div>
-            <div className="sidebar-header-button">
+            <div className="sidebar-header-button" onClick={() => setIsChatSelected(false)} title='New chat'>
                 <div className="sidebar-header-button-icon">
-                    <img src={SettingsIcon} alt="Nastavitve" width="25"/>
+                    <span className="material-symbols-outlined">
+                        add
+                    </span>
                 </div>
             </div>
-            <div className="sidebar-header-button">
+            <div className="sidebar-header-button" title='Log out'>
                 <div className="sidebar-header-button-icon" onClick={logout}>
-                    <img src={LogoutIcon} alt="Odjava" width="23"/>
+                    <span className="material-symbols-outlined">
+                        logout
+                    </span>
                 </div>
             </div>
         </div>

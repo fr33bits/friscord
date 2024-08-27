@@ -1,14 +1,3 @@
-.sidebar {
-    width: 300px;
-    color: rgb(36, 36, 36);
-
-    margin: 10.75px;
-    border-radius: 15px;
-    box-shadow: 0 0 12px 5px rgb(234, 234, 234);
-
-    padding: 10px;
-}
-
 .sidebar-header {
     display: flex;
     flex-direction: row;
@@ -36,7 +25,7 @@
 }
 
 .sidebar-header-button:hover {
-    border: solid 1.5px white;
+    background-color: rgba(255, 255, 255, 0.129);
 }
 
 .sidebar-header-button-icon {
@@ -87,4 +76,18 @@
     margin-left: 10px;
     color: rgb(122, 122, 122);
     font-size: 10px;
+}
+
+.sidebar-chat-item-last-message {
+    font-size: medium;
+    color: grey;
+}
+
+.sidebar-bottom .global-id {
+    border-radius: 5px;
+    padding: 5px;
+}
+
+.sidebar-bottom .global-id:hover {
+    background-color: rgb(225, 225, 225);
 }

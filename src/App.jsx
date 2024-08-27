@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react'
-import './App.css'
+import './App.css' // somehow styles from other CSS files are also availible
 
 import { auth, db } from './firebase-config.js'
 import { doc, getDoc, query, where, getDocs, collection } from 'firebase/firestore'
@@ -8,6 +8,8 @@ import { Auth } from './components/Auth.jsx'
 import { Chat } from './components/Chat.jsx'
 import { Sidebar } from './components/Sidebar.jsx'
 import { NewChat } from './components/NewChat.jsx'
+import { Settings } from './components/Settings.jsx'
+
 
 import Cookies from 'universal-cookie'
 const cookies = new Cookies()
@@ -18,6 +20,8 @@ function App() {
   // TODO: erase after log-out
   const [selectedChat, setSelectedChat] = useState(null)
   const [isChatSelected, setIsChatSelected] = useState(false)
+
+  const [showSettings, setShowSettings] = useState(false)
 
   // !!! auth.currentUser.uid is not accessible here for some reason
   // const user_id = cookies.get("auth-user")
@@ -33,32 +37,60 @@ function App() {
   //   }
   //   getSetUser()
   // }, []) // only runs once and after refresh
-  
+
+  const copyToClipboard = (text_to_copy) => {
+    navigator.clipboard.writeText(text_to_copy)
+            .then(() => {
+                console.log('Text copied to clipboard');
+            })
+            .catch(err => {
+                console.error('Failed to copy text: ', err);
+            });
+  }
+
   if (!isAuthenticated) {
     return (
       <div className="App">
-        <Auth setIsAuthenticated={setIsAuthenticated} setAuthenticatedUser={setAuthenticatedUser}/>
+        <Auth setIsAuthenticated={setIsAuthenticated} setAuthenticatedUser={setAuthenticatedUser} />
       </div>
     )
   } else {
     return (
       <div className="signedInView">
-        <div className='sidebar'>
-          <Sidebar
-            setIsAuthenticated={setIsAuthenticated}
-            setSelectedChat={setSelectedChat}
-            setIsChatSelected={setIsChatSelected}
-            authenticatedUser={authenticatedUser}
-            className='sidebar'
-          />
+        <div className='sidebars'>
+          <div className='sidebar sidebar-chatlist'>
+            <Sidebar
+              setIsAuthenticated={setIsAuthenticated}
+              setSelectedChat={setSelectedChat}
+              setIsChatSelected={setIsChatSelected}
+              authenticatedUser={authenticatedUser}
+              className='sidebar'
+            />
+          </div>
+          <div className='sidebar sidebar-bottom'>
+            <img src={authenticatedUser.photo_url} alt="" className='pfp' />
+            <div style={{ display: 'inline-block' }}>
+              <div className='user-name'>
+                {authenticatedUser.name}
+              </div>
+              <div className='global-id' title="Click to copy to clipboard" onClick={() => copyToClipboard(authenticatedUser.id_global)}>
+                {authenticatedUser.id_global}
+              </div>
+            </div>
+            {/* <span class="material-symbols-outlined" height='25'>
+              settings
+            </span> */}
+          </div>
         </div>
+
         <div className='main_view'>
           {isChatSelected
             ? <Chat selectedChat={selectedChat} authenticatedUser={authenticatedUser} />
             : <NewChat setSelectedChat={setSelectedChat} selectedChat={selectedChat} isChatSelected={isChatSelected} setIsChatSelected={setIsChatSelected} authenticatedUser={authenticatedUser} />
           }
         </div>
-      </div>
+        {showSettings ? <Settings authenticatedUser={authenticatedUser} setShowSettings={setShowSettings} /> : null}
+      </div >
     )
   }
 }
