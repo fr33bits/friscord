@@ -28,3 +28,17 @@ html, body,  #root, .App, .auth-container, .auth {
   -ms-user-select: none; /* IE 10 and IE 11 */
   user-select: none; /* Standard syntax */
 }
+
+.caption {
+  font-size: 13px;
+  color: rgb(86, 86, 86);
+}
+
+/* Google Fonts (and icons) */
+.material-symbols-outlined {
+  font-variation-settings:
+  'FILL' 0,
+  'wght' 400,
+  'GRAD' 0,
+  'opsz' 24
+}

@@ -7,6 +7,7 @@ import { doc, getDoc, query, where, getDocs, collection } from 'firebase/firesto
 import { Auth } from './components/Auth.jsx'
 import { Chat } from './components/Chat.jsx'
 import { Sidebar } from './components/Sidebar.jsx'
+import { NewChat } from './components/NewChat.jsx'
 
 import Cookies from 'universal-cookie'
 const cookies = new Cookies()
@@ -15,16 +16,8 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(cookies.get("auth-token"))
   const [authenticatedUser, setAuthenticatedUser] = useState(cookies.get("auth-user")) // user (ID) is stored in a cookie so as to not be lost on refresh
   // TODO: erase after log-out
-  const [selectedChat, setSelectedChat] = useState("")
+  const [selectedChat, setSelectedChat] = useState(null)
   const [isChatSelected, setIsChatSelected] = useState(false)
-
-  const getChat = async (chat_id) => {
-    const docRef = doc(db, "chats", chat_id)
-    const docSnap = await getDoc(docRef)
-    const data = docSnap.data()
-    data.id = docSnap.id // manually adds back in the Firestore document ID
-    return data
-  }
 
   // !!! auth.currentUser.uid is not accessible here for some reason
   // const user_id = cookies.get("auth-user")
@@ -62,16 +55,7 @@ function App() {
         <div className='main_view'>
           {isChatSelected
             ? <Chat selectedChat={selectedChat} authenticatedUser={authenticatedUser} />
-            : (
-              <div className="room">
-                {/* {auth.currentUser.uid
-                // !!! appears after saving but does not persist past refresh unless you're signing in for the first time
-                } */}
-                <label>Enter chat ID: </label>
-                <input onChange={async (e) => { const data = await getChat(e.target.value); setSelectedChat(data) }} />
-                <button onClick={() => setIsChatSelected(true)}>Confirm</button>
-              </div>
-            )
+            : <NewChat setSelectedChat={setSelectedChat} selectedChat={selectedChat} isChatSelected={isChatSelected} setIsChatSelected={setIsChatSelected} authenticatedUser={authenticatedUser} />
           }
         </div>
       </div>

@@ -3,7 +3,7 @@ import '../styles/Sidebar.css'
 import firebase from 'firebase/compat/app';
 import { signOut, getAuth, onAuthStateChanged } from 'firebase/auth'
 import { auth, db } from '../firebase-config.js'
-import { addDoc, collection, onSnapshot, serverTimestamp, where, query, orderBy, doc, getDoc } from 'firebase/firestore'
+import { addDoc, collection, onSnapshot, serverTimestamp, where, query, orderBy, doc, getDoc, getDocs, limit } from 'firebase/firestore'
 
 import SettingsIcon from '../assets/settings.png'
 import LogoutIcon from '../assets/logout.png'
@@ -11,19 +11,50 @@ import LogoutIcon from '../assets/logout.png'
 import Cookies from 'universal-cookie'
 const cookies = new Cookies();
 
-const ChatListItem = ({ chat_id, chat_name, member_ids, setSelectedChat, setIsChatSelected }) => {
+const ChatListItem = ({ chat, setSelectedChat, setIsChatSelected }) => {
+    const [lastMessage, setLastMessage] = useState(null)
+    const [lastMessageUser, setLastMessageUser] = useState(null)
 
-    const getChat = async (chat_id) => {
-        const docRef = doc(db, "chats", chat_id)
-        const docSnap = await getDoc(docRef)
-        const data = docSnap.data()
-        data.id = docSnap.id // manually adds back in the Firestore document ID
-        return data
-    }
+    useEffect(() => {
+        if (lastMessage) {
+            const usersRef = collection(db, 'users')
+            const getUser = async (user_id) => {
+                const q = query(usersRef, where("id_global", "==", user_id))
+                const querySnapshot = await getDocs(q);
+                const users = querySnapshot.docs.map(doc => doc.data());
+                setLastMessageUser(users[0]);
+            }
+            getUser(lastMessage.sender_id)
+        }
+    }, [lastMessage])
 
-    const selectChat = async () => {
-        const data = await getChat(chat_id)
-        setSelectedChat(data);
+    useEffect(() => {
+        const getLastMessage = async () => {
+
+            const messagesRef = collection(db, "messages")
+            const queryMessagesList = query(
+                messagesRef,
+                where("chat_id", "==", chat.id),
+                orderBy('createdAt', "desc"),
+                limit(1)
+            )
+    
+            const unsubscribe = onSnapshot(queryMessagesList, async (snapshot) => {
+                let queriedMessages = []
+                snapshot.forEach((doc) => {
+                    queriedMessages.push({ ...doc.data(), id: doc.id })
+                })
+                let queriedLastMessage = queriedMessages[0]
+                setLastMessage(queriedLastMessage)
+            })
+    
+            return () => unsubscribe()
+        }
+        getLastMessage()
+    }, [chat]);
+
+    const selectChat = () => {
+        setSelectedChat(chat);
         setIsChatSelected(true)
     }
 
@@ -34,9 +65,9 @@ const ChatListItem = ({ chat_id, chat_name, member_ids, setSelectedChat, setIsCh
             </div>
             <div className='sidebar-chat-item-text'>
                 <div className='sidebar-chat-item-header'>
-                    <span className='sidebar-chat-item-header-name' title={"Chat ID: "+ chat_id}>{chat_name} </span>
+                    <span className='sidebar-chat-item-header-name' title={"Chat ID: "+ chat.id}>{chat.name} </span>
                 </div>
-                <div className='sidebar-chat-item-last-message'>Placeholder text</div>
+                {lastMessageUser?.name ? <div className='sidebar-chat-item-last-message'>{lastMessageUser?.name.split(' ')[0]}: {lastMessage?.text}</div> : null}
             </div>
         </div>
     )
@@ -46,7 +77,7 @@ const ChatList = ({ setSelectedChat, setIsChatSelected, authenticatedUser}) => {
     const chatsRef = collection(db, 'chats')
     const [chats, setChats] = useState([])
 
-    // !!! THIS ABSOLUTELY ATE UP MEMORY
+    // !!! extremely bad performance memory-wise
     // onAuthStateChanged(auth, (user) => {
     //     if (user) {
     //         const uid = user.uid;
@@ -69,6 +100,14 @@ const ChatList = ({ setSelectedChat, setIsChatSelected, authenticatedUser}) => {
     //     }
     // });
 
+    // const getLastMessage = async (chat_id) => {
+    //     const documentsRef = collection(db, "messages")
+    //     const q = query(documentsRef, where("chat_id", "==", chat_id), orderBy('createdAt'))
+    //     const querySnapshot = await getDocs(q)
+    //     const messages = querySnapshot.docs.map(doc => doc.data());
+    //     return messages[0];
+    // }
+
     useEffect(() => {
         const queryChatList = query(
             chatsRef,
@@ -80,6 +119,7 @@ const ChatList = ({ setSelectedChat, setIsChatSelected, authenticatedUser}) => {
             snapshot.forEach((doc) => {
                 queriedChats.push({ ...doc.data(), id: doc.id })
             })
+            console.log(queriedChats)
             setChats(queriedChats)
         })
 
@@ -91,9 +131,7 @@ const ChatList = ({ setSelectedChat, setIsChatSelected, authenticatedUser}) => {
             {chats.map((chat) => (
                 <ChatListItem 
                     key={chat.id}
-                    chat_id={chat.id}
-                    chat_name={chat.name}
-                    members={chat.member_ids}
+                    chat={chat}
                     setSelectedChat={setSelectedChat}
                     setIsChatSelected={setIsChatSelected}
                 />

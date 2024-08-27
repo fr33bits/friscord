@@ -40,7 +40,7 @@ export const Chat = ({ selectedChat, authenticatedUser }) => {
     }, [messages]);
 
     const handleSubmit = async (event) => {
-        console.log("tuki dela auth:" + auth.currentUser.uid)
+        // !!! console.log("tuki dela auth:" + auth.currentUser.uid) (in res dela)
         event.preventDefault()
         if (newMessage === "") {
             return
