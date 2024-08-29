@@ -22,6 +22,7 @@ export const NewChat = ({ setSelectedChat, selectedChat, isChatSelected, setIsCh
             }
             const docRef = await addDoc(chatsRef, chatData)
             chatData.id = docRef.id
+
             setSelectedChat(chatData)
             setIsChatSelected(true)
         } catch (err) {
@@ -90,7 +91,7 @@ export const NewChat = ({ setSelectedChat, selectedChat, isChatSelected, setIsCh
                             </div>
                             <div>
                                 <p className='caption'>You will automatically be added as a member of a chat that you create. Using the fields below you can also add other users to the chat using their global ID (which ends with an @ sign followed by the service name).</p>
-                                <p className='caption'>Friscord uses randomly generated unique identifiers for addressing in order to prevent spam. To start a new chat, ask the people you want to chat with their global identifiers, which are displayed in the bottom left corner.</p>
+                                <p className='caption'>Friscord uses randomly generated unique identifiers for addressing in order to prevent spam. To start a new chat, ask the people you want to chat with to provide their global identifiers, which are displayed in the bottom left corner.</p>
                             </div>
                             <div>
                                 <div>
