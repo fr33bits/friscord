@@ -35,6 +35,10 @@
     justify-content: center;
 }
 
+.sidebar-chat-item-list {
+    overflow-y: scroll;
+}
+
 .sidebar-chat-item {
     margin: 10px;
     height: 50px;
