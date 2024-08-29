@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react'
 
-import { addDoc, collection, onSnapshot, serverTimestamp, where, query, orderBy, doc, getDocs } from 'firebase/firestore'
+import { addDoc, collection, onSnapshot, serverTimestamp, where, query, orderBy, doc, getDocs, queryEqual, Timestamp } from 'firebase/firestore'
 
 import { auth, db } from '../firebase-config.js'
 
@@ -86,6 +86,12 @@ export const Chat = ({ selectedChat, authenticatedUser }) => {
         fetchSenders()
     }, [messages])
 
+    const getDate = (firestore_timestamp) => {
+        const milliseconds = firestore_timestamp.seconds * 1000 + firestore_timestamp.nanoseconds / 1000000;
+        const javascriptDate = new Date(milliseconds);
+        return javascriptDate
+    }
+
     return (
         <div className="chat">
             <div className='header-background'></div>
@@ -112,15 +118,16 @@ export const Chat = ({ selectedChat, authenticatedUser }) => {
                                                 borderRadius: message.sender_id === authenticatedUser.id_global ? '15px 15px 0 15px' : '15px 15px 15px 0'
                                             }
                                         }
-                                        title={'Message ID: ' + message.id}
+                                        title={'Message ID: ' + message.id
+                                            + '\n' + getDate(message.createdAt)
+                                        }
                                     >
                                         {/* Style needed to push the message text to the right even though the parent div is already pushed to the right */}
                                         {message.text}
                                     </div>
-                                    <div className='message-timestamp'>
-                                        {format(Date(message.createdAt?.seconds), 'dd. MM. yyyy HH:mm:ss')}
-                                        {/* Potreben ? sicer vedno dobim napako */}
-                                    </div>
+                                    {/* <div className='message-timestamp'>
+                                        {message?.createdAt?.seconds ? getDate(message.createdAt.seconds) : null}
+                                    </div> */}
                                 </div>
                             </div>
                         ))}

@@ -8,7 +8,7 @@ import { addDoc, collection, onSnapshot, serverTimestamp, where, query, orderBy,
 import Cookies from 'universal-cookie'
 const cookies = new Cookies();
 
-const Avatars = ({chat_member_ids, authenticatedUser}) => {
+const Avatars = ({ chat_member_ids, authenticatedUser }) => {
     const [members, setMembers] = useState([]) // excludes the authenticated user
 
     useEffect(() => {
@@ -32,10 +32,12 @@ const Avatars = ({chat_member_ids, authenticatedUser}) => {
     }, [chat_member_ids])
 
     return (
-        <div>
-            { members.length === 0 ? (<img src="https://www.w3schools.com/howto/img_avatar2.png" alt="Avatar" className='sidebar-chat-item-pfp'/>) : null }
-            { members?.length > 0 ?
-            (<img src={members[0]?.photo_url} alt="Avatar" className='sidebar-chat-item-pfp' />) : null }
+        <div className='chat-icon-container'>
+            {members.length === 0 ? (<span class="material-symbols-outlined group-icon">
+                groups
+            </span>) : null}
+            {members?.length > 0 ?
+                (<img src={members[0]?.photo_url} alt="Avatar" className='sidebar-chat-item-pfp' />) : null}
         </div>
     )
 }
@@ -90,7 +92,7 @@ const ChatListItem = ({ chat, setSelectedChat, setIsChatSelected, authenticatedU
     return (
         <div className='sidebar-chat-item' onClick={selectChat}>
             <div className='sidebar-chat-item-pfp-container'>
-                <Avatars chat_member_ids={chat.member_ids} authenticatedUser={authenticatedUser}/>
+                <Avatars chat_member_ids={chat.member_ids} authenticatedUser={authenticatedUser} />
             </div>
             <div className='sidebar-chat-item-text'>
                 <div className='sidebar-chat-item-header'>
