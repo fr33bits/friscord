@@ -19,3 +19,4 @@ The client can also be deployed locally:
 ## Known issues
 
 - Recent versions of `firebase-js-sdk` contain a bug where `heartbeats undefined` is printed out several times in the console. See [here](https://github.com/firebase/firebase-js-sdk/issues/8436) for more information. The package version needs to be updated when a fix is released.
+- Lack of mobile support

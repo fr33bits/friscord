@@ -73,7 +73,12 @@ function App() {
               <div className='user-name'>
                 {authenticatedUser.name}
               </div>
-              <div className='global-id' title="Click to copy to clipboard" onClick={() => copyToClipboard(authenticatedUser.id_global)}>
+              <div
+                className='global-id'
+                title="Click to copy toclipboard"
+                data-toggle="tooltip" data-placement="top" title="Click to copy toclipboard"
+                onClick={() => copyToClipboard(authenticatedUser.id_global)}
+              >
                 {authenticatedUser.id_global}
               </div>
             </div>

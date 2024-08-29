@@ -33,7 +33,7 @@ const Avatars = ({ chat_member_ids, authenticatedUser }) => {
 
     return (
         <div className='chat-icon-container'>
-            {members.length === 0 ? (<span class="material-symbols-outlined group-icon">
+            {members.length === 0 ? (<span className="material-symbols-outlined group-icon">
                 groups
             </span>) : null}
             {members?.length > 0 ?

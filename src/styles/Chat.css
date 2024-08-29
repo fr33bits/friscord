@@ -31,6 +31,28 @@
     text-align: center; /* needed to center align the child div */
 }
 
+.header-item {
+    display: inline-block;
+    height: 100%;
+}
+
+.leave-chat-icon-container {
+    float: right;
+    margin-right: 10px;
+}
+
+.leave-chat-icon {
+    margin: 5px;
+    width: 40px;
+    border-radius: 50%;
+    line-height: 40px;
+    vertical-align: middle;
+}
+
+.leave-chat-icon:hover {
+    background-color: rgb(218, 218, 218);
+}
+
 .chat-title {
     display: inline-block;
     height: 100%;
