@@ -9,11 +9,12 @@
 .header-background {
     display: block;
     height: 60px;
-    width: 100%;
+    width: 120%;
     position: absolute;
     top: 0;
+    left: -10px;
     z-index: 7;
-    backdrop-filter: blur(30px);
+    backdrop-filter: blur(25px);
     -webkit-mask: linear-gradient(black 95%, transparent);
 }
 
@@ -123,8 +124,9 @@
     &:after {
         content: '';
         position: absolute;
+        width: 120%;
         top: -20px;
-        left: 0;
+        left: -10px;
         right: 0;
         bottom: 0;
         backdrop-filter: blur(20px);

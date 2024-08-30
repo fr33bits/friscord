@@ -52,6 +52,7 @@ html, body,  #root, .App, .auth-container, .auth {
   flex-direction: column;
   align-items: center;
   max-height: 100vh;
+  z-index: 100;
 }
 
 .sidebar {
