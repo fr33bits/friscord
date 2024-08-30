@@ -157,18 +157,16 @@ const ChatList = ({ setSelectedChat, setIsChatSelected, authenticatedUser }) => 
     }, [authenticatedUser]); // TODO: should really be changed every time a new message queue is created, no?
 
     return (
-        <div className='sidebar-chat-item-list-container'>
-            <div className='sidebar-chat-item-list'>
-                {chats.map((chat) => (
-                    <ChatListItem
-                        key={chat.id}
-                        chat={chat}
-                        setSelectedChat={setSelectedChat}
-                        setIsChatSelected={setIsChatSelected}
-                        authenticatedUser={authenticatedUser}
-                    />
-                ))}
-            </div>
+        <div className='sidebar-chat-item-list'>
+            {chats.map((chat) => (
+                <ChatListItem
+                    key={chat.id}
+                    chat={chat}
+                    setSelectedChat={setSelectedChat}
+                    setIsChatSelected={setIsChatSelected}
+                    authenticatedUser={authenticatedUser}
+                />
+            ))}
         </div>
     )
 }
@@ -207,7 +205,7 @@ const Header = ({ setIsAuthenticated, setSelectedChat, setIsChatSelected }) => {
 
 export const Sidebar = ({ setIsAuthenticated, setSelectedChat, setIsChatSelected, authenticatedUser }) => {
     return (
-        <div>
+        <div className="sidebar sidebar-chatlist">
             <Header
                 setIsAuthenticated={setIsAuthenticated}
                 setSelectedChat={setSelectedChat}

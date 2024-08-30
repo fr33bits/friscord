@@ -1,3 +1,13 @@
+html, body {
+  position: fixed; /* prevents elastic scroll on macOS */
+}
+
+html, body,  #root, .App, .auth-container, .auth {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
 .signedInView {
   display: flex;
   flex-direction: row;
@@ -10,12 +20,6 @@
 
 .gradient {
   background: linear-gradient(150deg, rgba(131, 58, 180, 1) 0%, rgb(29, 178, 253) 100%);
-}
-
-html, body,  #root, .App, .auth-container, .auth {
-  width: 100%;
-  height: 100%;
-  margin: 0;
 }
 
 .service-name {
@@ -47,6 +51,7 @@ html, body,  #root, .App, .auth-container, .auth {
   display: flex;
   flex-direction: column;
   align-items: center;
+  max-height: 100vh;
 }
 
 .sidebar {
@@ -62,7 +67,10 @@ html, body,  #root, .App, .auth-container, .auth {
 
 .sidebar-chatlist {
   flex: 1;
-  margin-bottom: 0;
+  margin-bottom: 0; /* ? why does the bottom margin of this element not cover up with the margin of the top element even though chat list items behave like that */
+  padding-bottom: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .sidebar-bottom {

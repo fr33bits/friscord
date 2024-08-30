@@ -35,10 +35,6 @@
     justify-content: center;
 }
 
-.sidebar-chat-item-list {
-    overflow-y: scroll;
-}
-
 .sidebar-chat-item {
     margin: 10px;
     height: 50px;
@@ -78,6 +74,19 @@
     vertical-align: middle;
     height: 100%;
     width: 100%;
+}
+
+.sidebar-chat-item-list {
+    flex: 1;
+    flex-basis: 0px; /* necessary to prevent the element from expanding to accomodat the (total) height of all child divs */
+    overflow-y: auto;
+
+    -ms-overflow-style: none;  /* Hide scrollbar in Internet Explorer and Edge */
+    scrollbar-width: none;  /* Hide scrollbar in Firefox */
+}
+
+.sidebar-chat-item-list::-webkit-scrollbar {
+    display: none; /* Hide scrollbar in Chrome, Safari, and Opera */
 }
 
 .sidebar-chat-item-text {

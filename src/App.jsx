@@ -58,15 +58,13 @@ function App() {
     return (
       <div className="signedInView">
         <div className='sidebars'>
-          <div className='sidebar sidebar-chatlist'>
-            <Sidebar
-              setIsAuthenticated={setIsAuthenticated}
-              setSelectedChat={setSelectedChat}
-              setIsChatSelected={setIsChatSelected}
-              authenticatedUser={authenticatedUser}
-              className='sidebar'
-            />
-          </div>
+          <Sidebar
+            setIsAuthenticated={setIsAuthenticated}
+            setSelectedChat={setSelectedChat}
+            setIsChatSelected={setIsChatSelected}
+            authenticatedUser={authenticatedUser}
+            className='sidebar'
+          />
           <div className='sidebar sidebar-bottom'>
             <img src={authenticatedUser.photo_url} alt="" className='pfp' />
             <div style={{ display: 'inline-block' }}>
