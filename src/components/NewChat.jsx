@@ -77,11 +77,11 @@ export const NewChat = ({ setSelectedChat, selectedChat, isChatSelected, setIsCh
     }
 
     return (
-        <div className='new-chat-container'>
-            <div className='new-chat-card'>
-                <div className='auth-form'>
+        <div className='card-container'>
+            <div className='card'>
+                <div className='form'>
                     <form>
-                        <div className='auth-form-field'>
+                        <div className='form-field'>
                             <label htmlFor='chatName'>Chat name</label>
                             <input name='chatName' placeholder='Chat name' onChange={(e) => {setName(e.target.value)}} />
                         </div>
@@ -96,12 +96,12 @@ export const NewChat = ({ setSelectedChat, selectedChat, isChatSelected, setIsCh
                             <div>
                                 <div>
                                     {members.map((member, index) => (
-                                        <div key={index} className='auth-form-field'>
-                                            <label htmlFor={'chatName' + index}>User {index+1}</label>
+                                        <div key={index} className='form-field'>
+                                            <label htmlFor={'user' + index}>User {index+1}</label>
                                             {/* TODO: fix the fact that pressing enter creates more null elements: likely simulates button press? */}
                                             {/* A separate div is needed below the label, otherwise the icon won't behave like an inline-blook */}
                                             <input
-                                                name={'chatName' + index}
+                                                name={'user' + index}
                                                 className={memberValidity[index] ? 'field-valid' : 'field-invalid'}
                                                 placeholder='Global user ID'
                                                 value={member}
@@ -123,7 +123,7 @@ export const NewChat = ({ setSelectedChat, selectedChat, isChatSelected, setIsCh
                                         </div>
                                     ))}
                                 </div>
-                                <div className='auth-form-button'>
+                                <div className='form-button'>
                                     {/* !!! For some reason this is already pushed to the list of members even without the button being clicked */}
                                     <button type='button' onClick={(e) => { // setting the button type to 'button' (instead of not setting the button type, which defaults to submit) has the same effect as e.preventDefault()
                                         let newMembers = [...members] // spread necessary, otherwise new members don't show up (see above)
@@ -136,8 +136,8 @@ export const NewChat = ({ setSelectedChat, selectedChat, isChatSelected, setIsCh
                                 </div>
                             </div>
                         </div>
-                        {/* <p className='auth-form-error-message'>{error}</p> */}
-                        <div className='auth-form-button'>
+                        {/* <p className='form-error-message'>{error}</p> */}
+                        <div className='form-button'>
                             <button type='submit' disabled={!formComplete()} onClick={(e) => {addChat(e)}}>Create chat</button>
                         </div>
                     </form>

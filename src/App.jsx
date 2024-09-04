@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react'
 import './App.css' // somehow styles from other CSS files are also availible
 
 import { auth, db } from './firebase-config.js'
-import { doc, getDoc, query, where, getDocs, collection } from 'firebase/firestore'
+import { doc, getDoc, query, where, getDocs, collection, onSnapshot } from 'firebase/firestore'
 
 import { Auth } from './components/Auth.jsx'
 import { Chat } from './components/Chat.jsx'
@@ -23,6 +23,8 @@ function App() {
 
   const [showSettings, setShowSettings] = useState(false)
 
+  const [showChatSettings, setShowChatSettings] = useState(false)
+
   // !!! auth.currentUser.uid is not accessible here for some reason
   // const user_id = cookies.get("auth-user")
   // useEffect(() => { // other user data is fetched upon every refresh; this is also necessary because auth does not have all the details on a user
@@ -40,13 +42,30 @@ function App() {
 
   const copyToClipboard = (text_to_copy) => {
     navigator.clipboard.writeText(text_to_copy)
-            .then(() => {
-                console.log('Text copied to clipboard');
-            })
-            .catch(err => {
-                console.error('Failed to copy text: ', err);
-            });
+      .then(() => {
+        console.log('Text copied to clipboard');
+      })
+      .catch(err => {
+        console.error('Failed to copy text: ', err);
+      });
   }
+
+  // !!! tried to have selected chat details update in real time but didn't get it working
+  // useEffect(() => {
+  //   if (selectedChat?.id) {
+  //     const chatRef = doc(db, 'chats', selectedChat.id)
+  
+  //     const unsubscribe = onSnapshot(chatRef, (docSnapshot) => {
+  //       if (docSnapshot.exists()) {
+  //         setSelectedChat(docSnapshot.data())
+  //         console.log("changed!")
+  //       } else {
+  //         console.log("The selected chat no longer exists!")
+  //       }
+  //     })
+  //     return () => unsubscribe()
+  //   }
+  // });
 
   if (!isAuthenticated) {
     return (
@@ -63,6 +82,7 @@ function App() {
             setSelectedChat={setSelectedChat}
             setIsChatSelected={setIsChatSelected}
             authenticatedUser={authenticatedUser}
+            setShowChatSettings={setShowChatSettings}
             className='sidebar'
           />
           <div className='sidebar sidebar-bottom'>
@@ -88,7 +108,7 @@ function App() {
 
         <div className='main_view'>
           {isChatSelected
-            ? <Chat selectedChat={selectedChat} authenticatedUser={authenticatedUser} />
+            ? <Chat selectedChat={selectedChat} setSelectedChat={setSelectedChat} authenticatedUser={authenticatedUser} showChatSettings={showChatSettings} setShowChatSettings={setShowChatSettings} />
             : <NewChat setSelectedChat={setSelectedChat} selectedChat={selectedChat} isChatSelected={isChatSelected} setIsChatSelected={setIsChatSelected} authenticatedUser={authenticatedUser} />
           }
         </div>

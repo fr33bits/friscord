@@ -42,7 +42,7 @@ const Avatars = ({ chat_member_ids, authenticatedUser }) => {
     )
 }
 
-const ChatListItem = ({ chat, setSelectedChat, setIsChatSelected, authenticatedUser }) => {
+const ChatListItem = ({ chat, setSelectedChat, setIsChatSelected, authenticatedUser, setShowChatSettings }) => {
     const [lastMessage, setLastMessage] = useState(null)
     const [lastMessageUser, setLastMessageUser] = useState(null)
 
@@ -87,6 +87,7 @@ const ChatListItem = ({ chat, setSelectedChat, setIsChatSelected, authenticatedU
     const selectChat = () => {
         setSelectedChat(chat);
         setIsChatSelected(true)
+        setShowChatSettings(false)
     }
 
     return (
@@ -104,7 +105,7 @@ const ChatListItem = ({ chat, setSelectedChat, setIsChatSelected, authenticatedU
     )
 }
 
-const ChatList = ({ setSelectedChat, setIsChatSelected, authenticatedUser }) => {
+const ChatList = ({ setSelectedChat, setIsChatSelected, authenticatedUser, setShowChatSettings }) => {
     const chatsRef = collection(db, 'chats')
     const [chats, setChats] = useState([])
 
@@ -165,6 +166,7 @@ const ChatList = ({ setSelectedChat, setIsChatSelected, authenticatedUser }) => 
                     setSelectedChat={setSelectedChat}
                     setIsChatSelected={setIsChatSelected}
                     authenticatedUser={authenticatedUser}
+                    setShowChatSettings={setShowChatSettings}
                 />
             ))}
         </div>
@@ -203,7 +205,7 @@ const Header = ({ setIsAuthenticated, setSelectedChat, setIsChatSelected }) => {
     )
 }
 
-export const Sidebar = ({ setIsAuthenticated, setSelectedChat, setIsChatSelected, authenticatedUser }) => {
+export const Sidebar = ({ setIsAuthenticated, setSelectedChat, setIsChatSelected, authenticatedUser, setShowChatSettings }) => {
     return (
         <div className="sidebar sidebar-chatlist">
             <Header
@@ -215,6 +217,7 @@ export const Sidebar = ({ setIsAuthenticated, setSelectedChat, setIsChatSelected
                 setSelectedChat={setSelectedChat}
                 setIsChatSelected={setIsChatSelected}
                 authenticatedUser={authenticatedUser}
+                setShowChatSettings={setShowChatSettings}
             />
         </div>
     )

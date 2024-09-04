@@ -1,8 +1,15 @@
-html, body {
-  position: fixed; /* prevents elastic scroll on macOS */
+html,
+body {
+  position: fixed;
+  /* prevents elastic scroll on macOS */
 }
 
-html, body,  #root, .App, .auth-container, .auth {
+html,
+body,
+#root,
+.App,
+.auth-container,
+.auth {
   width: 100%;
   height: 100%;
   margin: 0;
@@ -28,9 +35,12 @@ html, body,  #root, .App, .auth-container, .auth {
 }
 
 * {
-  -webkit-user-select: none; /* Safari */
-  -ms-user-select: none; /* IE 10 and IE 11 */
-  user-select: none; /* Standard syntax */
+  -webkit-user-select: none;
+  /* Safari */
+  -ms-user-select: none;
+  /* IE 10 and IE 11 */
+  user-select: none;
+  /* Standard syntax */
 }
 
 .caption {
@@ -41,10 +51,10 @@ html, body,  #root, .App, .auth-container, .auth {
 /* Google Fonts (and icons) */
 .material-symbols-outlined {
   font-variation-settings:
-  'FILL' 0,
-  'wght' 400,
-  'GRAD' 0,
-  'opsz' 24
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24
 }
 
 .sidebars {
@@ -68,7 +78,8 @@ html, body,  #root, .App, .auth-container, .auth {
 
 .sidebar-chatlist {
   flex: 1;
-  margin-bottom: 0; /* ? why does the bottom margin of this element not cover up with the margin of the top element even though chat list items behave like that */
+  margin-bottom: 0;
+  /* ? why does the bottom margin of this element not cover up with the margin of the top element even though chat list items behave like that */
   padding-bottom: 0;
   display: flex;
   flex-direction: column;
@@ -92,4 +103,223 @@ html, body,  #root, .App, .auth-container, .auth {
 
 .global-id {
   font-size: x-small;
+}
+
+/* CARDS */
+
+.card-container {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+/* needed when there should be other elements below the card so that it doesn't push them down but rather floats on top of them */
+.card-container-float {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.card-container-blur {
+  backdrop-filter: blur(3px);
+}
+
+.card {
+  /* min-height: 300px; */
+  min-width: 500px;
+  /* max-height: 500px; */
+  max-width: 600px;
+
+  background-color: white;
+  border-radius: 30px;
+  box-shadow: 0px 0px 30px 10px rgba(218, 218, 218, 0.382);
+
+  padding: 2rem;
+  transition: 0.8s ease;
+  /* background: #fff; */
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+/* FORMS */
+/* TODO: just like with other projects, there does not appear to be a transition with the label but this is nevertheless close enough */
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+
+  margin: 1rem 0rem;
+}
+
+.form-field label {
+  margin-bottom: 0.45rem;
+  color: #2397d1;
+  font-size: 12px;
+  font-family: Arial, Helvetica, sans-serif;
+  letter-spacing: 0.7px;
+  line-height: 1.3;
+}
+
+.form-field input {
+  padding: 0.55rem 0.4rem;
+  border: 1px solid #dcdddd;
+  border-radius: 4px;
+  font-size: 14px;
+  outline: none;
+  transition: all 150ms ease-in-out 0s;
+  background: white;
+  display: inline-block;
+}
+
+.form-field input::placeholder {
+  color: #9b9b9b;
+  width: 100%;
+  font-weight: unset;
+}
+
+.form-field input:hover {
+  border-color: #2397d1;
+}
+
+.form-field input:focus,
+.form-field input:active {
+  box-shadow: 0px 0px 0px 1.5px #2397d1;
+  border-color: #2397d1;
+}
+
+.form-field input {
+  color: rgb(36, 36, 36)
+}
+
+.form-error-message {
+  color: #2397d1;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 13px;
+  text-align: center;
+
+}
+
+.form-button {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: center;
+}
+
+.form-button button {
+  width: 50%;
+  border-radius: 25px;
+  background: #2397d1;
+  border: 3px solid #2397d1;
+  color: white;
+  font-weight: 800;
+  padding: 0.7rem 1.2rem;
+  outline: none;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.form-button button:hover {
+  background: #1d7aa9; /* changed a little */
+}
+
+.form-button button:disabled {
+  background: #939393; /* changed a little */
+  border-color: #939393;
+  cursor: default;
+}
+
+/* Field validation */
+/* !!! this likely does not work perfectly because the other styles also change other aspects of the border like the width */
+.form-field input.field-valid,
+.form-field input.field-valid:hover,
+.form-field input.field-valid:focus,
+.form-field input.field-valid:active {
+  border-color: green !important;
+}
+
+.form-field input.field-invalid,
+.form-field input.field-invalid:hover,
+.form-field input.field-invalid:focus,
+.form-field input.field-invalid:active {
+  border-color: red !important;
+}
+
+/* ! these below don't appear to be included anywhere */
+.auth__form-container_image {
+  flex: 3;
+  display: flex;
+  box-shadow: 1px 0px 5px rgba(0, 0, 0, 0.05);
+}
+
+.auth__form-container_image img {
+  width: 100%;
+  height: 100%;
+}
+
+.auth__form-container_fields-content p {
+  font-size: 1.5rem;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #05245a;
+  font-weight: 900;
+}
+
+.auth__form-container_fields-account {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+
+  margin-top: 0.2rem;
+}
+
+.auth__form-container_fields-account p {
+  font-size: 14px;
+  color: #000;
+  font-weight: 500;
+}
+
+.auth__form-container_fields-account span {
+  color: #EE230C;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+@media screen and (max-width: 800px) {
+  .auth__form-container {
+      flex-direction: column-reverse;
+  }
+
+  .auth__form-container_fields {
+      justify-content: flex-start;
+  }
+
+  .auth__form-container_image {
+      height: 100px;
+      flex: none;
+      box-shadow: none;
+  }
+
+  .auth__form-container_image img {
+      object-fit: cover;
+  }
+}
+
+@media screen and (max-width: 375px) {
+  .auth__form-container_fields {
+      padding: 2rem 0.5rem;
+  }
+
+  .auth__form-container_fields-content_input input {
+      width: 95%;
+  }
+
+  .auth__form-container_fields-content_input-password {
+      right: 3%;
+  }
 }
