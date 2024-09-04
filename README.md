@@ -2,7 +2,7 @@
 
 Friscord is a real-time instant messaging service for easy text communication between users. It uses Firebase Firestore for the backend, Google SSO for user login and React as a frontend framework.
 
-![Demo screenshot of the web client](src/assets/demo_main.png)
+![Demo screenshot of the web client](src/assets/demo_main_v2.png)
 
 ## Deployment
 
