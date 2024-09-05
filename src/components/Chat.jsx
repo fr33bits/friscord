@@ -85,7 +85,7 @@ const ChatSettings = ({ selectedChat, setSelectedChat, setShowChatSettings, auth
         <div className='card-container card-container-float card-container-blur' onClick={(e) => { if (e.target !== e.currentTarget) return; setShowChatSettings(false) }}>
             <div className='card' onClick={() => null}>
                 {selectedChat.createdBy !== authenticatedUser.id_global ?
-                    <p className='caption' style={{ color: 'red', textAlign: 'center' }}>You are not an admin for this chat. You can only view but not change the chat name and its members.</p>
+                    <p className='caption' style={{ color: 'red', textAlign: 'center' }}>You are not an admin of this chat. You can only view but not change the chat name and its members.</p>
                     : null
                 }
                 <form>
@@ -93,6 +93,7 @@ const ChatSettings = ({ selectedChat, setSelectedChat, setShowChatSettings, auth
                         <label htmlFor='chatName'>Chat name</label>
                         <input
                             name='chatName'
+                            className='form-field-input'
                             placeholder='Chat name'
                             defaultValue={selectedChat.name}
                             onChange={(e) => { setName(e.target.value) }}
@@ -120,7 +121,7 @@ const ChatSettings = ({ selectedChat, setSelectedChat, setShowChatSettings, auth
                                     <label htmlFor={'user' + 0}>You</label>
                                     <input
                                         name={'user' + 0}
-                                        className='field-valid'
+                                        className='field-valid form-field-input'
                                         placeholder='Global user ID'
                                         value={authenticatedUser.id_global}
                                         disabled
@@ -131,28 +132,32 @@ const ChatSettings = ({ selectedChat, setSelectedChat, setShowChatSettings, auth
                                         <label htmlFor={'user' + index}>User {index + 1}</label>
                                         {/* TODO: fix the fact that pressing enter creates more null elements: likely simulates button press? */}
                                         {/* A separate div is needed below the label, otherwise the icon won't behave like an inline-blook */}
-                                        <input
-                                            name={'user' + index}
-                                            className={memberValidity[index] ? 'field-valid' : 'field-invalid'}
-                                            placeholder='Global user ID'
-                                            value={member}
-                                            onChange={(e) => {
-                                                const newMembers = [...members] // spread needed to make sure that the array is actually copied instead of pasting a reference
-                                                newMembers[index] = e.target.value
-                                                setMembers(newMembers)
-                                            }}
-                                            disabled={selectedChat.createdBy !== authenticatedUser.id_global}
-                                        />
-                                        {selectedChat.createdBy !== authenticatedUser.id_global ?
-                                            <span
-                                                style={{ display: members.length > 1 ? 'inline-block' : 'none' }}
-                                                className="material-symbols-outlined"
-                                                onClick={() => setMembers([...members.slice(0, index), ...members.slice(index + 1)])}
-                                            >
-                                                cancel
-                                            </span>
+                                        <div className='form-field-input-container'>
+                                            <input
+                                                name={'user' + index}
+                                                className={memberValidity[index] ? 'field-valid form-field-input' : 'field-invalid form-field-input'}
+                                                placeholder='Global user ID'
+                                                value={member}
+                                                onChange={(e) => {
+                                                    const newMembers = [...members] // spread needed to make sure that the array is actually copied instead of pasting a reference
+                                                    newMembers[index] = e.target.value
+                                                    setMembers(newMembers)
+                                                }}
+                                                disabled={selectedChat.createdBy !== authenticatedUser.id_global}
+                                            />
+                                            {selectedChat.createdBy === authenticatedUser.id_global ?
+                                                <div className='form-field-input-remove'>
+                                                <div
+                                                    style={{ display: members.length > 0 ? 'inline-block' : 'none' }}
+                                                    className="material-symbols-outlined"
+                                                    onClick={() => setMembers([...members.slice(0, index), ...members.slice(index + 1)])}
+                                                >
+                                                    cancel
+                                                </div>
+                                            </div>
                                             : null
-                                        }
+                                            }
+                                        </div>
                                         {member === authenticatedUser.id_global && <p className='caption' style={{ color: 'red' }}>You cannot add yourself!</p>}
                                         {memberAlreadyAdded(member, index)}
                                     </div>
@@ -306,14 +311,14 @@ export const Chat = ({ selectedChat, setSelectedChat, authenticatedUser, setShow
             }
             <div className='header-background'></div>
             <div className="header">
-                <div className='header-item' style={{float: 'left'}}>
+                <div className='header-item' style={{ float: 'left' }}>
                     <span className="material-symbols-outlined leave-chat-icon" title="Add user to chat" onClick={() => setShowChatSettings(true)}>
                         settings
                     </span>
                 </div>
                 <div className="header-item chat-title">{selectedChat.name}</div>
                 {/* TODO: order of these float: right divs unclear */}
-                <div className='header-item' style={{float: 'right'}}>
+                <div className='header-item' style={{ float: 'right' }}>
                     <span className="material-symbols-outlined leave-chat-icon" title="Leave chat" onClick={() => leaveChat()}>
                         group_remove
                     </span>

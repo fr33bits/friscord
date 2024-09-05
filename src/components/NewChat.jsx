@@ -69,7 +69,7 @@ export const NewChat = ({ setSelectedChat, selectedChat, isChatSelected, setIsCh
         for (let j = 0; j < index; j++) {
             if (member === members[j]) {
                 return (
-                    <p className='caption' style={{color: 'red'}}>This user has already been added above!</p>
+                    <p className='caption' style={{ color: 'red' }}>This user has already been added above!</p>
                 )
             }
         }
@@ -83,7 +83,7 @@ export const NewChat = ({ setSelectedChat, selectedChat, isChatSelected, setIsCh
                     <form>
                         <div className='form-field'>
                             <label htmlFor='chatName'>Chat name</label>
-                            <input name='chatName' placeholder='Chat name' onChange={(e) => {setName(e.target.value)}} />
+                            <input name='chatName' placeholder='Chat name' className='form-field-input' onChange={(e) => { setName(e.target.value) }} />
                         </div>
                         <div>
                             <div>
@@ -97,28 +97,34 @@ export const NewChat = ({ setSelectedChat, selectedChat, isChatSelected, setIsCh
                                 <div>
                                     {members.map((member, index) => (
                                         <div key={index} className='form-field'>
-                                            <label htmlFor={'user' + index}>User {index+1}</label>
+                                            <label htmlFor={'user' + index}>User {index + 1}</label>
                                             {/* TODO: fix the fact that pressing enter creates more null elements: likely simulates button press? */}
-                                            {/* A separate div is needed below the label, otherwise the icon won't behave like an inline-blook */}
-                                            <input
-                                                name={'user' + index}
-                                                className={memberValidity[index] ? 'field-valid' : 'field-invalid'}
-                                                placeholder='Global user ID'
-                                                value={member}
-                                                onChange={(e) => {
-                                                    const newMembers = [...members] // spread needed to make sure that the array is actually copied instead of pasting a reference
-                                                    newMembers[index] = e.target.value
-                                                    setMembers(newMembers)
-                                                }}
-                                            />
-                                            <span
-                                                style={{display: members.length > 1 ? 'inline-block' : 'none'}}
-                                                className="material-symbols-outlined"
-                                                onClick={() => setMembers([...members.slice(0, index), ...members.slice(index + 1)])}
-                                            >
-                                                cancel
-                                            </span>
-                                            {member === authenticatedUser.id_global && <p className='caption' style={{color: 'red'}}>You cannot add yourself!</p>}
+                                            <div className='form-field-input-container'>
+                                                <input
+                                                    name={'user' + index}
+                                                    className={memberValidity[index] ? 'field-valid form-field-input' : 'field-invalid form-field-input'}
+                                                    placeholder='Global user ID'
+                                                    value={member}
+                                                    onChange={(e) => {
+                                                        const newMembers = [...members] // spread needed to make sure that the array is actually copied instead of pasting a reference
+                                                        newMembers[index] = e.target.value
+                                                        setMembers(newMembers)
+                                                    }}
+                                                />
+                                                { members.length > 1 ?
+                                                    <div className='form-field-input-remove'>
+                                                        <div
+                                                            style={{ display: members.length > 1 ? 'inline-block' : 'none' }}
+                                                            className="material-symbols-outlined"
+                                                            onClick={() => setMembers([...members.slice(0, index), ...members.slice(index + 1)])}
+                                                        >
+                                                            cancel
+                                                        </div>
+                                                    </div>
+                                                    : null
+                                                }
+                                            </div>
+                                            {member === authenticatedUser.id_global && <p className='caption' style={{ color: 'red' }}>You cannot add yourself!</p>}
                                             {memberAlreadyAdded(member, index)}
                                         </div>
                                     ))}
@@ -138,7 +144,7 @@ export const NewChat = ({ setSelectedChat, selectedChat, isChatSelected, setIsCh
                         </div>
                         {/* <p className='form-error-message'>{error}</p> */}
                         <div className='form-button'>
-                            <button type='submit' disabled={!formComplete()} onClick={(e) => {addChat(e)}}>Create chat</button>
+                            <button type='submit' disabled={!formComplete()} onClick={(e) => { addChat(e) }}>Create chat</button>
                         </div>
                     </form>
                 </div>
