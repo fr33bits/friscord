@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/friscord/static/css/main.c37f5784.css",
-    "main.js": "/friscord/static/js/main.c1313c67.js",
+    "main.css": "/friscord/static/css/main.5f9475c3.css",
+    "main.js": "/friscord/static/js/main.ef047e44.js",
     "index.html": "/friscord/index.html",
-    "main.c37f5784.css.map": "/friscord/static/css/main.c37f5784.css.map",
-    "main.c1313c67.js.map": "/friscord/static/js/main.c1313c67.js.map"
+    "main.5f9475c3.css.map": "/friscord/static/css/main.5f9475c3.css.map",
+    "main.ef047e44.js.map": "/friscord/static/js/main.ef047e44.js.map"
   },
   "entrypoints": [
-    "static/css/main.c37f5784.css",
-    "static/js/main.c1313c67.js"
+    "static/css/main.5f9475c3.css",
+    "static/js/main.ef047e44.js"
   ]
 }
