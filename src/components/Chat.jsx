@@ -8,25 +8,43 @@ import '../styles/Chat.css'
 
 const ChatSettings = ({ selectedChat, setSelectedChat, setShowChatSettings, authenticatedUser }) => { // takes a lot of things after NewChat.jsx
     const [name, setName] = useState(selectedChat.name)
-    const [members, setMembers] = useState(selectedChat.member_ids.filter(member_id => member_id !== authenticatedUser.id_global)) // TODO: should also make sure this array (should it even be an array???) does not allow duplicate values
+    const [members, setMembers] = useState(selectedChat.member_ids)
     const [memberValidity, setMemberValidity] = useState([false]) // set to false just in case one of the users deleted their account while this window is open (though this would probably be caught upstream anyway)
-    // ! the number of array fields is not correct however
+    
+    const generateBoolArray = (admin_ids, member_ids) => {
+        let boolArray = []
+        member_ids.forEach((member_id, index) => {
+            boolArray.push(admin_ids.includes(member_id) ? true : false)
+        })
+        return boolArray
+    }
+    const [admins, setAdmins] = useState(generateBoolArray(selectedChat.admin_ids, selectedChat.member_ids))
     const [error, setError] = useState(null)
 
-    // TODO: transform this into an update
     const chatRef = doc(db, 'chats', selectedChat.id)
     const updateChat = async (event) => {
         event.preventDefault()
+        const getAdminList = () => {
+            let adminList = []
+            admins.forEach((admin, index) => {
+                if (admin)
+                    adminList.push(members[index])
+            })
+            return adminList
+        }
         const updatedChatData = {
             name: name,
-            member_ids: [authenticatedUser.id_global, ...members] // !!! to ne dela ok, ker vrne samo številko 2
+            member_ids: members,
+            admin_ids: getAdminList()
         }
+
         updateDoc(chatRef, updatedChatData)
             .then(() => {
                 // TODO: to posodabljanje ni elegantno in bi se moglo izvesti upstream
                 let prevSelectedChat = { ...selectedChat }
                 prevSelectedChat.name = name
-                prevSelectedChat.member_ids = [authenticatedUser.id_global, ...members]
+                prevSelectedChat.member_ids = members
+                prevSelectedChat.admin_ids = getAdminList()
                 setSelectedChat(prevSelectedChat)
                 setShowChatSettings(false)
             })
@@ -42,7 +60,7 @@ const ChatSettings = ({ selectedChat, setSelectedChat, setShowChatSettings, auth
             for (let i = 0; i < members.length; i++) {
                 const checkValidityForSpecificMember = async (user_id_global) => {
                     // check the user isn't the currently authenticated user
-                    if (authenticatedUser.id_global === user_id_global) return false
+                    if (authenticatedUser.id_global === user_id_global && memberAlreadyAdded(user_id_global, i)) return false
 
                     // check that the user has already been previously entered (the first instance of the user returns as valid)
                     for (let j = 0; j < i; j++) {
@@ -65,7 +83,7 @@ const ChatSettings = ({ selectedChat, setSelectedChat, setShowChatSettings, auth
     }, [members]) // ? so kakšni problemi zaradi končne spremembe identifikatorjev
 
     const formComplete = () => {
-        return name.length > 0 && memberValidity.every(value => value === true)
+        return name.length > 0 && memberValidity.every(value => value === true) && !admins.every(value => value === false)
     }
 
     const memberAlreadyAdded = (member, index) => {
@@ -73,128 +91,154 @@ const ChatSettings = ({ selectedChat, setSelectedChat, setShowChatSettings, auth
 
         for (let j = 0; j < index; j++) {
             if (member === members[j]) {
-                return (
-                    <p className='caption' style={{ color: 'red' }}>This user has already been added above!</p>
-                )
+                return true
             }
         }
         return null
     }
 
-    return (
-        <div className='card-container card-container-float card-container-blur' onClick={(e) => { if (e.target !== e.currentTarget) return; setShowChatSettings(false) }}>
-            <div className='card' onClick={() => null}>
-                {selectedChat.createdBy !== authenticatedUser.id_global ?
-                    <p className='caption' style={{ color: 'red', textAlign: 'center' }}>You are not an admin of this chat. You can only view but not change the chat name and its members.</p>
-                    : null
-                }
-                <form>
-                    <div className='form-field'>
-                        <label htmlFor='chatName'>Chat name</label>
-                        <input
-                            name='chatName'
-                            className='form-field-input'
-                            placeholder='Chat name'
-                            defaultValue={selectedChat.name}
-                            onChange={(e) => { setName(e.target.value) }}
-                            disabled={selectedChat.createdBy !== authenticatedUser.id_global}
-                        />
+return (
+    <div className='card-container card-container-float card-container-blur' onClick={(e) => { if (e.target !== e.currentTarget) return; setShowChatSettings(false) }}>
+        <div className='card' onClick={() => null}>
+            {!selectedChat.admin_ids.includes(authenticatedUser.id_global) ?
+                <p className='caption' style={{ color: 'red', textAlign: 'center' }}>You are not an admin of this chat. You can only view but not change the chat name and its members.</p>
+                : null
+            }
+            <form>
+                <div className='form-field'>
+                    <label htmlFor='chatName'>Chat name</label>
+                    <input
+                        name='chatName'
+                        className='form-field-input'
+                        placeholder='Chat name'
+                        defaultValue={selectedChat.name}
+                        onChange={(e) => { setName(e.target.value) }}
+                        disabled={!selectedChat.admin_ids.includes(authenticatedUser.id_global)}
+                    />
+                </div>
+                <div>
+                    <div>
+                        <h4>Members</h4>
+                    </div>
+                    <div>
+                        <p className='caption'>You cannot remove yourself as a member of this chat here. If you want to remove yourself from this chat, please use the 'Leave chat' button.</p>
+                        {selectedChat.admin_ids.includes(authenticatedUser.id_global) ?
+                            <div>
+                                <p className='caption'>You cannot remove all other members from the chat as the chat must have at least two members. All other members can however leave the chat themselves.</p>
+                                <p className='caption'>Using the fields below you can also add other users to the chat using their global ID (which ends with an @ sign followed by the service name).</p>
+                                <p className='caption'>Friscord uses randomly generated unique identifiers for addressing in order to prevent spam. To add a user to the chat, ask them to provide you their global identifier, which is displayed in the bottom left corner.</p>
+                            </div>
+                            : null
+                        }
                     </div>
                     <div>
                         <div>
-                            <h4>Members</h4>
-                        </div>
-                        <div>
-                            <p className='caption'>You cannot remove yourself as a member of this chat here. If you want to remove yourself from this chat, please use the 'Leave chat' button.</p>
-                            {selectedChat.createdBy === authenticatedUser.id_global ?
-                                <div>
-                                    <p className='caption'>You cannot remove all other members from the chat as the chat must have at least two members. All other members can however leave the chat themselves.</p>
-                                    <p className='caption'>Using the fields below you can also add other users to the chat using their global ID (which ends with an @ sign followed by the service name).</p>
-                                    <p className='caption'>Friscord uses randomly generated unique identifiers for addressing in order to prevent spam. To add a user to the chat, ask them to provide you their global identifier, which is displayed in the bottom left corner.</p>
-                                </div>
-                                : null
-                            }
-                        </div>
-                        <div>
-                            <div>
-                                <div className='form-field'>
-                                    <label htmlFor={'user' + 0}>You</label>
-                                    <input
-                                        name={'user' + 0}
-                                        className='field-valid form-field-input'
-                                        placeholder='Global user ID'
-                                        value={authenticatedUser.id_global}
-                                        disabled
-                                    />
-                                </div>
-                                {members.map((member, index) => (
-                                    <div key={index} className='form-field'>
-                                        <label htmlFor={'user' + index}>User {index + 1}</label>
-                                        {/* TODO: fix the fact that pressing enter creates more null elements: likely simulates button press? */}
-                                        {/* A separate div is needed below the label, otherwise the icon won't behave like an inline-blook */}
-                                        <div className='form-field-input-container'>
-                                            <input
-                                                name={'user' + index}
-                                                className={memberValidity[index] ? 'field-valid form-field-input' : 'field-invalid form-field-input'}
-                                                placeholder='Global user ID'
-                                                value={member}
-                                                onChange={(e) => {
-                                                    const newMembers = [...members] // spread needed to make sure that the array is actually copied instead of pasting a reference
-                                                    newMembers[index] = e.target.value
-                                                    setMembers(newMembers)
-                                                }}
-                                                disabled={selectedChat.createdBy !== authenticatedUser.id_global}
-                                            />
-                                            {selectedChat.createdBy === authenticatedUser.id_global ?
-                                                <div className='form-field-input-remove'>
+                            {members.map((member, index) => (
+                                <div key={index} className='form-field'>
+                                    <label htmlFor={'user' + index}>
+                                        User {index + 1}
+                                        {member === authenticatedUser.id_global && !memberAlreadyAdded(member, index) ? <span className='pill pill-you'>You</span> : null}
+                                        {selectedChat.admin_ids.includes(member) && !memberAlreadyAdded(member, index) ? <span className='pill pill-admin'>Admin</span> : null}
+                                    </label>
+                                    {/* TODO: fix the fact that pressing enter creates more null elements: likely simulates button press? */}
+                                    {/* A separate div is needed below the label, otherwise the icon won't behave like an inline-blook */}
+                                    <div className='form-field-input-container'>
+                                        <input
+                                            name={'user' + index}
+                                            className={memberValidity[index] ? 'field-valid form-field-input' : 'field-invalid form-field-input'}
+                                            placeholder='Global user ID'
+                                            value={member}
+                                            onChange={(e) => {
+                                                const newMembers = [...members] // spread needed to make sure that the array is actually copied instead of pasting a reference
+                                                newMembers[index] = e.target.value
+                                                setMembers(newMembers)
+                                            }}
+                                            disabled={
+                                                !selectedChat.admin_ids.includes(authenticatedUser.id_global) ||
+                                                member === authenticatedUser.id_global && !memberAlreadyAdded(member, index)
+                                            }
+                                        />
+                                        {selectedChat.admin_ids.includes(authenticatedUser.id_global) ? admins[index] ?
+                                            <div
+                                                className='form-field-input-side-button-container'
+                                                title="Remove admin privileges"
+                                                onClick={() => setAdmins((prevAdmins) => prevAdmins.map((admin, i) => (i === index ? false : admin)))}>
+                                                <span className="material-symbols-outlined">
+                                                    remove_moderator
+                                                </span>
+                                            </div> :
+                                            <div
+                                                className='form-field-input-side-button-container'
+                                                title="Make user an admin"
+                                                onClick={() => setAdmins((prevAdmins) => prevAdmins.map((admin, i) => (i === index ? true : admin)))}>
+                                                <span className="material-symbols-outlined">
+                                                    add_moderator
+                                                </span>
+                                            </div>
+                                            : null
+                                        }
+                                        {selectedChat.admin_ids.includes(authenticatedUser.id_global) && (member !== authenticatedUser.id_global || memberAlreadyAdded(member, index)) ?
+                                            <div className='form-field-input-side-button-container' title="Remove user">
                                                 <div
                                                     style={{ display: members.length > 0 ? 'inline-block' : 'none' }}
                                                     className="material-symbols-outlined"
-                                                    onClick={() => setMembers([...members.slice(0, index), ...members.slice(index + 1)])}
+                                                    onClick={() => {
+                                                        setMembers([...members.slice(0, index), ...members.slice(index + 1)])
+                                                        setAdmins([...admins.slice(0, index), ...admins.slice(index + 1)]) // !!! ne začne pri 1
+                                                    }}
                                                 >
                                                     cancel
                                                 </div>
                                             </div>
                                             : null
-                                            }
-                                        </div>
-                                        {member === authenticatedUser.id_global && <p className='caption' style={{ color: 'red' }}>You cannot add yourself!</p>}
-                                        {memberAlreadyAdded(member, index)}
+                                        }
                                     </div>
-                                ))}
-                            </div>
-                            {selectedChat.createdBy === authenticatedUser.id_global ?
-                                <div className='form-button'>
-                                    {/* !!! For some reason this is already pushed to the list of members even without the button being clicked */}
-                                    <button type='button' onClick={(e) => { // setting the button type to 'button' (instead of not setting the button type, which defaults to submit) has the same effect as e.preventDefault()
-                                        let newMembers = [...members] // spread necessary, otherwise new members don't show up (see above)
-                                        newMembers.push("");
-                                        setMembers(newMembers)
-                                    }}
-                                    >
-                                        Add member
-                                    </button>
+                                    {memberAlreadyAdded(member, index) ?
+                                        member === authenticatedUser.id_global ?
+                                            <p className='caption' style={{ color: 'red' }}>You cannot add yourself!</p> :
+                                            <p className='caption' style={{ color: 'red' }}>This user has already been added above!</p>
+                                        : null
+                                    }
                                 </div>
-                                : null
-                            }
+                            ))}
+                        </div>
+                        {admins.every(value => value === false) ? <p className='caption' style={{ color: 'red' , textAlign: 'center'}}>The chat must have at least one admin!</p> : null}
+                        {selectedChat.admin_ids.includes(authenticatedUser.id_global) ?
+                            <div className='form-button'>
+                                {/* !!! For some reason this is already pushed to the list of members even without the button being clicked */}
+                                <button type='button' onClick={(e) => { // setting the button type to 'button' (instead of not setting the button type, which defaults to submit) has the same effect as e.preventDefault()
+                                    let newMembers = [...members] // spread necessary, otherwise new members don't show up (see above)
+                                    newMembers.push("");
+                                    setMembers(newMembers)
+
+                                    let newAdmins = [...admins]
+                                    newAdmins.push(false);
+                                    setAdmins(newAdmins)
+                                }}
+                                >
+                                    Add member
+                                </button>
+                            </div>
+                            : null
+                        }
+                    </div>
+                </div>
+                {!selectedChat.admin_ids.includes(authenticatedUser.id_global) ?
+                    <div className='form-button'>
+                        <button type='button' onClick={() => setShowChatSettings(false)}>Close</button>
+                    </div>
+                    :
+                    <div>
+                        {error ? <p className='form-error-message'>{error}</p> : null}
+                        <div className='form-button'>
+                            <button type='submit' disabled={!formComplete()} onClick={(e) => { updateChat(e) }}>Save</button>
                         </div>
                     </div>
-                    {selectedChat.createdBy !== authenticatedUser.id_global ?
-                        <div className='form-button'>
-                            <button type='button' onClick={() => setShowChatSettings(false)}>Close</button>
-                        </div>
-                        :
-                        <div>
-                            {error ? <p className='form-error-message'>{error}</p> : null}
-                            <div className='form-button'>
-                                <button type='submit' disabled={!formComplete()} onClick={(e) => { updateChat(e) }}>Save</button>
-                            </div>
-                        </div>
-                    }
-                </form>
-            </div>
+                }
+            </form>
         </div>
-    )
+    </div>
+)
 }
 
 export const Chat = ({ selectedChat, setSelectedChat, authenticatedUser, setShowChatSettings, showChatSettings }) => {
@@ -285,13 +329,13 @@ export const Chat = ({ selectedChat, setSelectedChat, authenticatedUser, setShow
 
     const leaveChat = async () => {
         const docRef = doc(db, "chats", selectedChat.id)
-        const confirmation = window.confirm(`Are you sure you want to exist chat "${selectedChat.name}"?`)
+        const confirmation = window.confirm(`Are you sure you want to exit the chat "${selectedChat.name}"?`)
         if (confirmation) {
             try {
                 await updateDoc(docRef, {
-                    member_ids: arrayRemove(authenticatedUser.id_global)
+                    member_ids: arrayRemove(authenticatedUser.id_global),
+                    admin_ids: arrayRemove(authenticatedUser.id_global)
                 })
-                console.log("Chat left sucessfully!")
             } catch (error) {
                 console.error("Error leaving chat: ", error)
             }

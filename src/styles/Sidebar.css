@@ -114,8 +114,11 @@
 .sidebar-bottom .global-id {
     border-radius: 5px;
     padding: 5px;
+
+    font-size: x-small;
+    background-color: #efeeee;
 }
 
 .sidebar-bottom .global-id:hover {
-    background-color: rgb(225, 225, 225);
+    background-color: rgb(204, 204, 204);
 }

@@ -93,8 +93,8 @@ function App() {
               </div>
               <div
                 className='global-id'
-                title="Click to copy toclipboard"
-                data-toggle="tooltip" data-placement="top" title="Click to copy toclipboard"
+                title="Click to copy to clipboard"
+                data-toggle="tooltip" data-placement="top"
                 onClick={() => copyToClipboard(authenticatedUser.id_global)}
               >
                 {authenticatedUser.id_global}

@@ -7,8 +7,18 @@ import { addDoc, collection, onSnapshot, serverTimestamp, where, query, orderBy,
 
 export const NewChat = ({ setSelectedChat, selectedChat, isChatSelected, setIsChatSelected, authenticatedUser }) => {
     const [name, setName] = useState("")
-    const [members, setMembers] = useState([""]) // TODO: should also make sure this array (should it even be an array???) does not allow duplicate values
+    const [members, setMembers] = useState([""]) // TODO: implement duplicate value checking in the backend
     const [memberValidity, setMemberValidity] = useState([false])
+    const [admins, setAdmins] = useState([false])
+
+    const getAdminList = () => {
+        let adminList = [authenticatedUser.id_global]
+        admins.forEach((admin, index) => {
+            if (admin)
+                adminList.push(members[index])
+        })
+        return adminList
+    }
 
     const chatsRef = collection(db, 'chats')
     const addChat = async (event) => {
@@ -18,7 +28,8 @@ export const NewChat = ({ setSelectedChat, selectedChat, isChatSelected, setIsCh
                 name: name,
                 createdAt: serverTimestamp(),
                 createdBy: authenticatedUser.id_global,
-                member_ids: [authenticatedUser.id_global, ...members] // !!! to ne dela ok, ker vrne samo številko 2
+                member_ids: [authenticatedUser.id_global, ...members],
+                admin_ids: getAdminList()
             }
             const docRef = await addDoc(chatsRef, chatData)
             chatData.id = docRef.id
@@ -111,12 +122,34 @@ export const NewChat = ({ setSelectedChat, selectedChat, isChatSelected, setIsCh
                                                         setMembers(newMembers)
                                                     }}
                                                 />
-                                                { members.length > 1 ?
-                                                    <div className='form-field-input-remove'>
+                                                {admins[index] ?
+                                                    <div
+                                                        className='form-field-input-side-button-container'
+                                                        title="Remove admin privileges"
+                                                        onClick={() => setAdmins((prevAdmins) => prevAdmins.map((admin, i) => (i === index ? false : admin)))}>
+                                                        <span className="material-symbols-outlined">
+                                                            remove_moderator
+                                                        </span>
+                                                    </div> :
+                                                    <div
+                                                        className='form-field-input-side-button-container'
+                                                        title="Make user an admin"
+                                                        onClick={() => setAdmins((prevAdmins) => prevAdmins.map((admin, i) => (i === index ? true : admin)))}>
+                                                        <span className="material-symbols-outlined">
+                                                            add_moderator
+                                                        </span>
+                                                    </div>
+                                                }
+                                                {members.length > 1 ?
+                                                    <div className='form-field-input-side-button-container' title="Remove user">
                                                         <div
+
                                                             style={{ display: members.length > 1 ? 'inline-block' : 'none' }}
                                                             className="material-symbols-outlined"
-                                                            onClick={() => setMembers([...members.slice(0, index), ...members.slice(index + 1)])}
+                                                            onClick={() => {
+                                                                setMembers([...members.slice(0, index), ...members.slice(index + 1)])
+                                                                setAdmins([...admins.slice(0, index), ...admins.slice(index + 1)])
+                                                            }}
                                                         >
                                                             cancel
                                                         </div>
@@ -135,6 +168,10 @@ export const NewChat = ({ setSelectedChat, selectedChat, isChatSelected, setIsCh
                                         let newMembers = [...members] // spread necessary, otherwise new members don't show up (see above)
                                         newMembers.push("");
                                         setMembers(newMembers)
+
+                                        let newAdmins = [...admins]
+                                        newAdmins.push(false);
+                                        setAdmins(newAdmins)
                                     }}
                                     >
                                         Add member

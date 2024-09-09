@@ -101,10 +101,6 @@ body,
   font-size: medium;
 }
 
-.global-id {
-  font-size: x-small;
-}
-
 /* CARDS */
 
 .card-container {
@@ -145,6 +141,22 @@ body,
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
+}
+
+/* PILLS */
+.pill {
+  padding: 4px;
+  margin: 4px;
+  border-radius: 4px;
+  color: white;
+}
+
+.pill-you {
+  background-color: rgba(131, 58, 180, 1);
+}
+
+.pill-admin {
+  background-color: rgb(230, 50, 50);
 }
 
 /* FORMS */
@@ -261,7 +273,7 @@ body,
   border-color: red !important;
 }
 
-.form-field-input-remove {
+.form-field-input-side-button-container {
   height: 40px;
   width: 40px;
   margin-left: 7px;
@@ -271,7 +283,7 @@ body,
   justify-content: center;
 }
 
-.form-field-input-remove:hover {
+.form-field-input-side-button-container:hover {
   border-radius: 50%;
   background-color: #dad8d8;
 }
