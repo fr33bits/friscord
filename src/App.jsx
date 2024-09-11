@@ -87,7 +87,7 @@ function App() {
           />
           <div className='sidebar sidebar-bottom'>
             <img src={authenticatedUser.photo_url} alt="" className='pfp' />
-            <div style={{ display: 'inline-block' }}>
+            <div style={{ display: 'inline-block' }} className='sidebar-bottom-text'>
               <div className='user-name'>
                 {authenticatedUser.name}
               </div>

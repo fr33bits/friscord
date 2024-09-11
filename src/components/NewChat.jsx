@@ -141,15 +141,18 @@ export const NewChat = ({ setSelectedChat, selectedChat, isChatSelected, setIsCh
                                                     </div>
                                                 }
                                                 {members.length > 1 ?
-                                                    <div className='form-field-input-side-button-container' title="Remove user">
+                                                    <div
+                                                        className='form-field-input-side-button-container'
+                                                        title="Remove user"
+                                                        onClick={() => {
+                                                            setMembers([...members.slice(0, index), ...members.slice(index + 1)])
+                                                            setAdmins([...admins.slice(0, index), ...admins.slice(index + 1)])
+                                                        }}
+                                                    >
                                                         <div
 
                                                             style={{ display: members.length > 1 ? 'inline-block' : 'none' }}
                                                             className="material-symbols-outlined"
-                                                            onClick={() => {
-                                                                setMembers([...members.slice(0, index), ...members.slice(index + 1)])
-                                                                setAdmins([...admins.slice(0, index), ...admins.slice(index + 1)])
-                                                            }}
                                                         >
                                                             cancel
                                                         </div>

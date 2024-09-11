@@ -50,14 +50,18 @@
     background-color: rgb(218, 218, 218);
 }
 
-.chat-title {
+.chat-name {
     display: inline-block;
     height: 100%;
+    width: 50%; /* also used to prevent overly long chat names overflowing and taking up too much space (TODO: change on mobile) */
     line-height: 50px;
     margin-right: auto;
     margin-left: auto;
     text-align: center;
     vertical-align: middle;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* MESSAGES */

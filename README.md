@@ -4,6 +4,8 @@ Friscord is a real-time instant messaging service for easy text communication be
 
 ![Demo screenshot of the web client](src/assets/demo_main_v2.png)
 
+Friscord has support for admins and their management of group membership.
+
 ## Deployment
 
 A GitHub Pages deployment of the app can be accessed at [https://fr33bits.github.io/friscord/](https://fr33bits.github.io/friscord/).

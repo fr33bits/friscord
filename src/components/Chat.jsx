@@ -178,14 +178,18 @@ return (
                                             : null
                                         }
                                         {selectedChat.admin_ids.includes(authenticatedUser.id_global) && (member !== authenticatedUser.id_global || memberAlreadyAdded(member, index)) ?
-                                            <div className='form-field-input-side-button-container' title="Remove user">
+                                            <div
+                                                className='form-field-input-side-button-container'
+                                                title="Remove user"
+                                                onClick={() => {
+                                                    setMembers([...members.slice(0, index), ...members.slice(index + 1)])
+                                                    setAdmins([...admins.slice(0, index), ...admins.slice(index + 1)]) // !!! ne začne pri 1
+                                                }}
+                                            >
                                                 <div
                                                     style={{ display: members.length > 0 ? 'inline-block' : 'none' }}
                                                     className="material-symbols-outlined"
-                                                    onClick={() => {
-                                                        setMembers([...members.slice(0, index), ...members.slice(index + 1)])
-                                                        setAdmins([...admins.slice(0, index), ...admins.slice(index + 1)]) // !!! ne začne pri 1
-                                                    }}
+                                                
                                                 >
                                                     cancel
                                                 </div>
@@ -322,7 +326,7 @@ export const Chat = ({ selectedChat, setSelectedChat, authenticatedUser, setShow
     }, [messages])
 
     const getDate = (firestore_timestamp) => {
-        const milliseconds = firestore_timestamp.seconds * 1000 + firestore_timestamp.nanoseconds / 1000000;
+        const milliseconds = firestore_timestamp?.seconds * 1000 + firestore_timestamp?.nanoseconds / 1000000;
         const javascriptDate = new Date(milliseconds);
         return javascriptDate
     }
@@ -360,7 +364,7 @@ export const Chat = ({ selectedChat, setSelectedChat, authenticatedUser, setShow
                         settings
                     </span>
                 </div>
-                <div className="header-item chat-title">{selectedChat.name}</div>
+                <div className="header-item chat-name">{selectedChat.name}</div>
                 {/* TODO: order of these float: right divs unclear */}
                 <div className='header-item' style={{ float: 'right' }}>
                     <span className="material-symbols-outlined leave-chat-icon" title="Leave chat" onClick={() => leaveChat()}>

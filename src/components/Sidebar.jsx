@@ -96,10 +96,19 @@ const ChatListItem = ({ chat, setSelectedChat, setIsChatSelected, authenticatedU
                 <Avatars chat_member_ids={chat.member_ids} authenticatedUser={authenticatedUser} />
             </div>
             <div className='sidebar-chat-item-text'>
-                <div className='sidebar-chat-item-header'>
-                    <span className='sidebar-chat-item-header-name' title={"Chat ID: " + chat.id}>{chat.name} </span>
+                <div className='sidebar-chat-item-header' title={"Chat ID: " + chat.id}>
+                    {chat.name}
                 </div>
-                {lastMessageUser?.name ? <div className='sidebar-chat-item-last-message'>{lastMessageUser?.name.split(' ')[0]}: {lastMessage?.text}</div> : null}
+                {lastMessageUser?.name ?
+                    <div className='sidebar-chat-item-last-message'>
+                        {lastMessageUser?.id_global === authenticatedUser.id_global ? 
+                            'You' :
+                            lastMessageUser?.name.split(' ')[0]
+                        }
+                        : {lastMessage?.text}
+                    </div>
+                    : null
+                }
             </div>
         </div>
     )
