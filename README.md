@@ -15,7 +15,7 @@ The client can also be deployed locally:
 1. Open the CLI in the directory where you want the project.
 2. Run `git clone https://github.com/fr33bits/friscord.git`.
 3. Install the necessary packages by running the `npm i` command.
-4. Set up a development server using the `npm serve`command.
+4. Set up a development server using the `npm run start` command.
 5. A new browser window should open with the app.
 
 ## Known issues and work in progress
